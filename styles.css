@@ -47,7 +47,7 @@ button:hover {
   background: #45a049;
 }
 
-/* radio 與 checkbox 基本對齊 */
+/* radio 與 checkbox 對齊設定 */
 input[type="radio"],
 input[type="checkbox"] {
   vertical-align: middle;
@@ -60,7 +60,7 @@ input[type="checkbox"] {
   margin-right: 15px;
 }
 
-/* ========== 食材選項 (checkbox 同行 + 對齊 + 美觀) ========== */
+/* ========== 食材選項 (checkbox) ========== */
 .food-item {
   display: flex;
   align-items: center;
@@ -75,11 +75,12 @@ input[type="checkbox"] {
 
 .food-item input[type="checkbox"] {
   flex-shrink: 0;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   margin: 0;
-  margin-top: 2px;
-  transform: scale(1.1);
+  vertical-align: middle;
+  position: relative;
+  top: 1px; /* ✅ 這是最關鍵的微調，解決垂直差半字問題 */
 }
 
 .food-item label {
@@ -139,7 +140,7 @@ input[type="checkbox"] {
   box-sizing: border-box;
 }
 
-/* ========== 響應式 for 手機與 iPhone 14 ========== */
+/* ========== 響應式設計 for iPhone 14 ========== */
 @media (max-width: 420px) {
   #calculator-form,
   #results {
@@ -152,9 +153,9 @@ input[type="checkbox"] {
   }
 
   .food-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    transform: scale(1.1) translateY(2px);
+    width: 16px;
+    height: 16px;
+    top: 1px; /* ✅ 手機上也保持對齊 */
   }
 
   .food-item label {
