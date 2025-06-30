@@ -1,0 +1,82 @@
+/* ========== 全局 ========== */
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f4f4;
+  padding:20px;
+}
+.container{
+  width:90%;
+  max-width:1080px;
+  margin:0 auto;
+  background:#fff;
+  padding:24px;
+  border-radius:10px;
+  box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+h1{text-align:center}
+
+/* ========== 表單元素 ========== */
+label{display:block;margin-top:12px}
+input,select,button{
+  width:100%;padding:8px;margin:10px 0;border:1px solid #ccc;border-radius:4px;box-sizing:border-box
+}
+button{
+  background:#4CAF50;color:#fff;font-size:16px;cursor:pointer
+}
+button:hover{background:#45a049}
+
+/* radio 與 checkbox 基本對齊 */
+input[type="radio"],input[type="checkbox"]{
+  vertical-align:middle;margin-right:6px
+}
+.inline-label{
+  display:inline-flex;align-items:center;margin-right:15px
+}
+
+/* ========== 食材選項 (checkbox) ========== */
+.food-item{
+  display:flex;align-items:center;gap:8px;margin:8px 0
+}
+.food-item input[type="checkbox"]{
+  flex:0 0 24px;height:20px;transform:scale(1.2)
+}
+.food-item label{flex:1;font-size:16px;line-height:1.4;word-break:break-word;cursor:pointer}
+
+/* ========== 結果區 (卡片) ========== */
+#results{
+  background:#fafafa;border:1px solid #ddd;padding:20px;border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,.08)
+}
+#results p{font-size:18px;margin:10px 0;font-weight:500}
+
+/* 食材份量卡片 */
+#food-portion-results{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:12px;margin-top:10px
+}
+.food-result-item{
+  background:#fff;border:1px solid #e0e0e0;padding:12px 14px;border-radius:8px;
+  box-shadow:0 1px 3px rgba(0,0,0,.05);font-size:16px;line-height:1.5
+}
+
+/* ========== 雙欄佈局 ========== */
+.calculator-grid{
+  display:flex;flex-wrap:wrap;gap:20px
+}
+#calculator-form,#results{
+  flex:1 1 48%;box-sizing:border-box
+}
+
+/* ========== 響應式 (手機單欄) ========== */
+@media(max-width:768px){
+  #calculator-form,#results{flex:1 1 100%}
+}
+#macro-summary {
+    margin: 10px 0 20px;
+    padding: 12px 16px;
+    background-color: #eef8f6;
+    border-left: 5px solid #4CAF50;
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1.6;
+}

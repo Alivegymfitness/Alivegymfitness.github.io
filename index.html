@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>飲食計算器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>飲食計算器</h1>
+
+    <!-- 雙欄排版容器 -->
+    <div class="calculator-grid">
+      
+      <!-- ➤ 輸入表單 -->
+      <form id="calculator-form">
+        <label for="weight">體重 (kg):</label>
+        <input type="number" id="weight" required>
+
+        <label for="height">身高 (cm):</label>
+        <input type="number" id="height" required>
+
+        <label for="age">年齡:</label>
+        <input type="number" id="age" required>
+
+        <label>性別:</label>
+        <label class="inline-label">
+          <input type="radio" name="gender" value="male" checked> 男
+        </label>
+        <label class="inline-label">
+          <input type="radio" name="gender" value="female"> 女
+        </label>
+
+        <label for="activity-level">活動水平:</label>
+        <select id="activity-level" required>
+          <option value="1.2">久坐不動</option>
+          <option value="1.375">輕度活動</option>
+          <option value="1.55">中度活動</option>
+          <option value="1.725">高度活動</option>
+          <option value="1.9">極高活動</option>
+        </select>
+
+        <label for="goal">目標:</label>
+        <select id="goal">
+          <option value="maintain">維持體重</option>
+          <option value="lose">減重</option>
+          <option value="gain">增重</option>
+        </select>
+
+        <label for="carb-type">飲食模式:</label>
+        <select id="carb-type">
+          <option value="low">低碳 (4:2:4)</option>
+          <option value="medium" selected>中碳 (3:3.5:3.5)</option>
+          <option value="high">高碳 (2:5:3)</option>
+        </select>
+
+        <h3>選擇食材</h3>
+        <h4>蛋白質</h4>
+        <div id="protein-food" class="food-group"></div>
+
+        <h4>碳水化合物</h4>
+        <div id="carb-food" class="food-group"></div>
+
+        <h4>脂肪</h4>
+        <div id="fat-food" class="food-group"></div>
+
+        <button type="submit">計算熱量需求</button>
+      </form>
+
+      <!-- ➤ 計算結果（初始隱藏） -->
+        <div id="results" style="display:none;">
+        <p id="tdee-result"></p>
+        <p id="caloric-needs-result"></p>
+
+        <h3>三大營養素建議攝取量</h3>
+        <div id="macro-summary"></div>
+
+        <h3>所需食材份數</h3>
+        <div id="food-portion-results"></div>
+        </div>
+
+    </div> <!-- /calculator-grid -->
+  </div> <!-- /container -->
+
+  <script src="script.js"></script>
+</body>
+</html>
