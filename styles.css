@@ -63,16 +63,16 @@ input[type="checkbox"] {
 /* ========== 食材選項 (checkbox) ========== */
 .food-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   margin: 8px 0;
-  flex-wrap: wrap; /* 允許自動換行 */
 }
 
 .food-item input[type="checkbox"] {
   flex: 0 0 24px;
   height: 20px;
   transform: scale(1.2);
+  margin-top: 3px;
 }
 
 .food-item label {
@@ -80,8 +80,8 @@ input[type="checkbox"] {
   font-size: 16px;
   line-height: 1.4;
   word-break: break-word;
-  white-space: normal;
   overflow-wrap: break-word;
+  white-space: normal;
   cursor: pointer;
 }
 
@@ -136,21 +136,6 @@ input[type="checkbox"] {
   #calculator-form,
   #results {
     flex: 1 1 100%;
-  }
-}
-
-@media (max-width: 600px) {
-  .food-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .food-item input[type="checkbox"] {
-    margin-bottom: 4px;
-  }
-
-  .food-item label {
-    width: 100%;
   }
 }
 
