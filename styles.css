@@ -63,26 +63,27 @@ input[type="checkbox"] {
 /* ========== 食材選項 (checkbox) ========== */
 .food-item {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center; /* 讓 checkbox 與文字垂直置中 */
+  gap: 10px;
   margin: 8px 0;
 }
 
 .food-item input[type="checkbox"] {
-  flex: 0 0 24px;
-  height: 20px;
-  transform: scale(1.2);
-  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  transform: translateY(1px); /* 微調與文字對齊 */
+  margin: 0;
 }
 
 .food-item label {
   flex: 1;
   font-size: 16px;
-  line-height: 1.4;
+  line-height: 1.5;
+  cursor: pointer;
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: normal;
-  cursor: pointer;
 }
 
 /* ========== 結果區 (卡片) ========== */
@@ -103,7 +104,7 @@ input[type="checkbox"] {
 /* 食材份量卡片 */
 #food-portion-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: 12px;
   margin-top: 10px;
 }
@@ -131,11 +132,28 @@ input[type="checkbox"] {
   box-sizing: border-box;
 }
 
-/* ========== 響應式 (手機單欄) ========== */
-@media (max-width: 768px) {
+/* ========== 響應式設計 for iPhone 14（390px） ========== */
+@media (max-width: 420px) {
   #calculator-form,
   #results {
     flex: 1 1 100%;
+  }
+
+  .food-item {
+    align-items: flex-start;
+  }
+
+  .food-item input[type="checkbox"] {
+    transform: translateY(3px); /* 再微調小螢幕對齊 */
+  }
+
+  .food-item label {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  #food-portion-results {
+    grid-template-columns: 1fr;
   }
 }
 
