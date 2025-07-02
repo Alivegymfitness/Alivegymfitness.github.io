@@ -1,20 +1,36 @@
 const foodData = {
-    "protein": [
-        { "name": "雞胸肉", "calories": 165, "protein": 31, "carbs": 0, "fat": 3.6 },
-        { "name": "鮭魚", "calories": 206, "protein": 22, "carbs": 0, "fat": 12 },
-        { "name": "豆腐", "calories": 144, "protein": 17, "carbs": 3.9, "fat": 8 }
-    ],
-    "carbs": [
-        { "name": "米飯", "calories": 130, "protein": 2.7, "carbs": 28, "fat": 0.3 },
-        { "name": "麵包", "calories": 265, "protein": 9, "carbs": 49, "fat": 3.2 },
-        { "name": "地瓜", "calories": 86, "protein": 1.6, "carbs": 20.1, "fat": 0.1 }
-    ],
-    "fat": [
-        { "name": "橄欖油", "calories": 884, "protein": 0, "carbs": 0, "fat": 100 },
-        { "name": "牛油果", "calories": 160, "protein": 2, "carbs": 8.5, "fat": 14.7 },
-        { "name": "堅果", "calories": 600, "protein": 20, "carbs": 20, "fat": 50 }
-    ]
+  protein: [
+    { name: "鮪魚", calories: 132, protein: 28, carbs: 0, fat: 1 },
+    { name: "花枝", calories: 92, protein: 15, carbs: 3, fat: 1 },
+    { name: "梅花肉", calories: 300, protein: 20, carbs: 0, fat: 24 },
+    { name: "五花肉", calories: 395, protein: 14, carbs: 0, fat: 38 },
+    { name: "一般魚類", calories: 110, protein: 22, carbs: 0, fat: 2 },
+    { name: "雞胸", calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+    { name: "豬肝", calories: 135, protein: 20, carbs: 2, fat: 4 },
+    { name: "雞蛋白", calories: 52, protein: 11, carbs: 1, fat: 0.2 },
+    { name: "無糖豆漿", calories: 45, protein: 3.5, carbs: 2, fat: 2 },
+    { name: "雞腿", calories: 180, protein: 25, carbs: 0, fat: 8 },
+    { name: "雞蛋", calories: 155, protein: 13, carbs: 1, fat: 11 },
+    { name: "牛肉", calories: 250, protein: 26, carbs: 0, fat: 17 },
+    { name: "高蛋白", calories: 120, protein: 24, carbs: 2, fat: 2 }
+  ],
+  fat: [
+
+    { name: "沙拉醬", calories: 600, protein: 0, carbs: 3, fat: 66 },
+    { name: "鮮奶油", calories: 340, protein: 2, carbs: 3, fat: 36 },
+    { name: "花生粉", calories: 570, protein: 25, carbs: 20, fat: 45 },
+    { name: "腰果", calories: 553, protein: 18, carbs: 30, fat: 44 },
+    { name: "油", calories: 884, protein: 0, carbs: 0, fat: 100 }
+  ],
+  carbs: [
+    { name: "飯", calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+    { name: "麥片", calories: 380, protein: 10, carbs: 70, fat: 6 },
+    { name: "拉麵", calories: 450, protein: 9, carbs: 65, fat: 15 },
+    { name: "馬鈴薯", calories: 77, protein: 2, carbs: 17, fat: 0.1 },
+    { name: "番薯", calories: 86, protein: 1.6, carbs: 20, fat: 0.1 }
+  ]
 };
+
 
 // 初始化食材選項
 function loadFoodOptions() {
@@ -153,7 +169,7 @@ function calculateFoodPortionsByMacronutrient(selectedFoods, caloricNeeds, mode)
 document.getElementById('calculator-form').addEventListener('submit', function (event) {
     event.preventDefault();
     document.getElementById('results').style.display = 'block';
-
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     const weight = parseFloat(document.getElementById('weight').value);
     const height = parseFloat(document.getElementById('height').value);
     const age = parseFloat(document.getElementById('age').value);
