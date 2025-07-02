@@ -169,7 +169,9 @@ function calculateFoodPortionsByMacronutrient(selectedFoods, caloricNeeds, mode)
 document.getElementById('calculator-form').addEventListener('submit', function (event) {
     event.preventDefault();
     document.getElementById('results').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.innerWidth > 768) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     const weight = parseFloat(document.getElementById('weight').value);
     const height = parseFloat(document.getElementById('height').value);
     const age = parseFloat(document.getElementById('age').value);
