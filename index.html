@@ -9,7 +9,7 @@
 <body>
 
   <div class="container" >
-    
+
     <div style="display: flex; justify-content: center; align-items: center; text-align: center;">
       <h1 style="display: flex; align-items: center; margin: 0;">
         <img src="亞樂-去背.png" style="height: 100px; margin-right: 10px;">
@@ -17,10 +17,8 @@
       </h1>
     </div>
 
-    <!-- 雙欄排版容器 -->
     <div class="calculator-grid">
-      
-      <!-- ➤ 輸入表單 -->
+
       <form id="calculator-form">
         <label for="weight">體重 (kg):</label>
         <input type="number" id="weight" required>
@@ -33,19 +31,19 @@
 
         <label>性別:</label>
         <label class="inline-label">
-          <input type="radio" name="gender" value="male" checked> 男
+          <input type="radio" name="gender" value="male" checked> 男性
         </label>
         <label class="inline-label">
-          <input type="radio" name="gender" value="female"> 女
+          <input type="radio" name="gender" value="female"> 女性
         </label>
 
         <label for="activity-level">活動水平:</label>
-        <select id="activity-level" required>
-          <option value="1.2">久坐不動(基本坐著)</option>
-          <option value="1.375">輕度活動(不太費力的基本活動，如散步)</option>
-          <option value="1.55">中度活動(呼吸及心跳些微加快，如掃地、健走)</option>
-          <option value="1.725">高度活動(呼吸及心跳快速且大量流汗，如打球、騎單車)</option>
-          <option value="1.9">極高活動(長時間耗費體力，如：長跑、運動訓練)</option>
+        <select id="activity-level">
+          <option value="1.2">久坐 (很少運動)</option>
+          <option value="1.375">輕度活動 (輕度運動1-3天/週)</option>
+          <option value="1.55">中度活動 (中度運動3-5天/週)</option>
+          <option value="1.725">高度活動 (高強度運動6-7天/週)</option>
+          <option value="1.9">極度活動 (運動員，每日訓練)</option>
         </select>
 
         <label for="goal">目標:</label>
@@ -62,36 +60,36 @@
           <option value="high">高碳 (2:5:3)</option>
         </select>
 
-        <h3>選擇食材</h3>
-        <h4>蛋白質</h4>
-        <div id="protein-food" class="food-group"></div>
-
-        <h4>碳水化合物</h4>
-        <div id="carb-food" class="food-group"></div>
-
-        <h4>脂肪</h4>
-        <div id="fat-food" class="food-group"></div>
-
-        <button type="submit">計算熱量需求</button>
+        <button type="submit" style="display: none;">計算熱量需求</button>
       </form>
 
-      <!-- ➤ 計算結果（初始隱藏） -->
-        <div id="results" style="display:none;">
+      <div id="results" style="display:none;">
         <p id="tdee-result"></p>
         <p id="caloric-needs-result"></p>
         <h3>三大營養素建議攝取量</h3>
         <div id="macro-summary"></div>
-        <h3>達成評估</h3>
-        <div id="balance-summary" style="display:none; background: #fef8e7; border-left: 5px solid orange; padding: 12px 16px; border-radius: 6px; font-size: 15px; line-height: 1.5;"></div>
 
+      </div>
 
-        <h3>所需食材份數</h3>
-        <div id="food-portion-results"></div>
+    </div>
+
+    <div class="food-options">
+      <h3>食材選項</h3>
+      <div class="food-columns">
+        <div>
+          <h4>蛋白質</h4>
+          <div id="protein-food" class="food-group"></div>
         </div>
+        <div>
+          <h4>碳水化合物</h4>
+          <div id="carb-food" class="food-group"></div>
+          <h4>脂肪</h4>
+          <div id="fat-food" class="food-group"></div>
+        </div>
+      </div>
+    </div>
 
-    </div> <!-- /calculator-grid -->
-  </div> <!-- /container -->
-  <script src="https://cdn.jsdelivr.net/npm/javascript-lp-solver@0.4.24/prod/solver.min.js"></script>
+  </div>
 
   <script src="script.js"></script>
 </body>

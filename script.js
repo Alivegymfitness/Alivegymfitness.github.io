@@ -1,50 +1,33 @@
 // 引入資料
 const foodData = {
   protein: [
-    { name: "鮪魚", calories: 132, protein: 28, carbs: 0, fat: 1 },
-    { name: "花枝", calories: 92, protein: 15, carbs: 3, fat: 1 },
-    { name: "一般魚類", calories: 110, protein: 22, carbs: 0, fat: 2 },
-    { name: "雞胸", calories: 165, protein: 31, carbs: 0, fat: 3.6 },
-    { name: "豬肝", calories: 135, protein: 20, carbs: 2, fat: 4 },
-    { name: "雞蛋白", calories: 52, protein: 11, carbs: 1, fat: 0.2 },
-    { name: "無糖豆漿", calories: 45, protein: 3.5, carbs: 2, fat: 2 },
-    { name: "雞腿", calories: 180, protein: 25, carbs: 0, fat: 8 },
-    { name: "雞蛋", calories: 155, protein: 13, carbs: 1, fat: 11 },
-    { name: "牛肉", calories: 250, protein: 26, carbs: 0, fat: 17 },
-    { name: "高蛋白", calories: 120, protein: 24, carbs: 2, fat: 2 }
+    { name: "鮪魚", calories: 132, protein: 28 },
+    { name: "花枝", calories: 92, protein: 15 },
+    { name: "一般魚類", calories: 110, protein: 22 },
+    { name: "雞胸", calories: 165, protein: 31 },
+    { name: "豬肝", calories: 135, protein: 20 },
+    { name: "雞蛋白", calories: 52, protein: 11 },
+    { name: "無糖豆漿", calories: 45, protein: 3.5 },
+    { name: "雞腿", calories: 180, protein: 25},
+    { name: "雞蛋", calories: 155, protein: 13 },
+    { name: "牛肉", calories: 250, protein: 26},
+    { name: "高蛋白", calories: 120, protein: 24 }
   ],
   fat: [
-    { name: "沙拉醬", calories: 600, protein: 0, carbs: 3, fat: 66 },
-    { name: "鮮奶油", calories: 340, protein: 2, carbs: 3, fat: 36 },
-    { name: "花生粉", calories: 570, protein: 25, carbs: 20, fat: 45 },
-    { name: "腰果", calories: 553, protein: 18, carbs: 30, fat: 44 },
-    { name: "油", calories: 884, protein: 0, carbs: 0, fat: 100 }
+    { name: "沙拉醬", calories: 600, fat: 66 },
+    { name: "鮮奶油", calories: 340,fat: 36 },
+    { name: "花生粉", calories: 570, fat: 45 },
+    { name: "腰果", calories: 553,fat: 44 },
+    { name: "油", calories: 884,  fat: 100 }
   ],
   carbs: [
-    { name: "飯", calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
-    { name: "麥片", calories: 380, protein: 10, carbs: 70, fat: 6 },
-    { name: "拉麵", calories: 450, protein: 9, carbs: 65, fat: 15 },
-    { name: "馬鈴薯", calories: 77, protein: 2, carbs: 17, fat: 0.1 },
-    { name: "番薯", calories: 86, protein: 1.6, carbs: 20, fat: 0.1 }
+    { name: "飯", calories: 130, carbs: 28 },
+    { name: "麥片", calories: 380, carbs: 70 },
+    { name: "拉麵", calories: 450, carbs: 65},
+    { name: "馬鈴薯", calories: 77,  carbs: 17 },
+    { name: "番薯", calories: 86, carbs: 20}
   ]
 };
-
-function loadFoodOptions() {
-  const createOption = (el, idPrefix, list, category) => {
-    list.forEach(food => {
-      const div = document.createElement('div');
-      div.classList.add('food-item');
-      div.innerHTML = `
-        <input type="checkbox" id="${idPrefix}-${food.name}" value="${food.name}" data-category="${category}">
-        <label for="${idPrefix}-${food.name}">${food.name} (每100克: ${food.calories} 大卡)</label>
-      `;
-      el.appendChild(div);
-    });
-  };
-  createOption(document.getElementById('protein-food'), 'protein', foodData.protein, 'protein');
-  createOption(document.getElementById('carb-food'), 'carbs', foodData.carbs, 'carbs');
-  createOption(document.getElementById('fat-food'), 'fat', foodData.fat, 'fat');
-}
 
 function calculateBMR(weight, height, age, gender) {
   return gender === 'male'
@@ -64,9 +47,70 @@ function calculateCaloricNeeds(tdee, goal) {
   }
 }
 
-// 修改 displayMacronutrients 函數，顯示目標值
+// 修改 loadFoodOptions 函數以接受 targetMacros
+function loadFoodOptions(targetMacros) {
+  const proteinFoodDiv = document.getElementById('protein-food');
+  const carbFoodDiv = document.getElementById('carb-food');
+  const fatFoodDiv = document.getElementById('fat-food');
+
+  // 清空之前的選項以避免重複
+  proteinFoodDiv.innerHTML = '';
+  carbFoodDiv.innerHTML = '';
+  fatFoodDiv.innerHTML = '';
+
+  const createOption = (el, idPrefix, list, category) => {
+    list.forEach(food => {
+      const div = document.createElement('div');
+      div.classList.add('food-item');
+
+      let singleNutrientInfo = '';
+      let primaryNutrientGrams = 0;
+      let primaryNutrientLabel = '';
+      let primaryNutrientKey = '';
+
+      if (targetMacros) { // 只有當 targetMacros 有值時才計算單一營養素需求
+        if (category === 'protein' && food.protein > 0) {
+          primaryNutrientKey = 'protein';
+          primaryNutrientLabel = '蛋白質';
+          primaryNutrientGrams = Math.round((targetMacros.protein * 100) / food.protein);
+        } else if (category === 'carbs' && food.carbs > 0) {
+          primaryNutrientKey = 'carbs';
+          primaryNutrientLabel = '碳水化合物';
+          primaryNutrientGrams = Math.round((targetMacros.carbs * 100) / food.carbs);
+        } else if (category === 'fat' && food.fat > 0) {
+          primaryNutrientKey = 'fat';
+          primaryNutrientLabel = '脂肪';
+          primaryNutrientGrams = Math.round((targetMacros.fat * 100) / food.fat);
+        }
+
+        if (primaryNutrientGrams > 0) {
+          singleNutrientInfo = `，約需 ${primaryNutrientGrams} 克`;
+        } else if (primaryNutrientKey && food[primaryNutrientKey] === 0) {
+          singleNutrientInfo = `，此食材不含主要${primaryNutrientLabel}`;
+        }
+      }
+
+      const proteinDisplay = food.protein > 0 ? `, 蛋白質:${food.protein}g` : '';
+      const carbsDisplay = food.carbs > 0 ? `, 碳水:${food.carbs}g` : '';
+      const fatDisplay = food.fat > 0 ? `, 脂肪:${food.fat}g` : '';
+
+      div.innerHTML = `
+        <label id="${idPrefix}-${food.name}" value="${food.name}" data-category="${category}">
+        <label for="${idPrefix}-${food.name}">${food.name} (每100克: ${food.calories} 大卡${proteinDisplay}${carbsDisplay}${fatDisplay})${singleNutrientInfo}</label>
+      `;
+      el.appendChild(div);
+    });
+  };
+
+  createOption(proteinFoodDiv, 'protein', foodData.protein, 'protein');
+  createOption(carbFoodDiv, 'carbs', foodData.carbs, 'carbs');
+  createOption(fatFoodDiv, 'fat', foodData.fat, 'fat');
+}
+
+// 顯示三大營養素的目標值
 function displayMacronutrients(caloricNeeds, mode) {
   const macroDiv = document.getElementById('macro-summary');
+  macroDiv.style.display = "block";
   const modeRatios = {
     low: { carbs: 0.2, protein: 0.4, fat: 0.4 },
     medium: { carbs: 0.35, protein: 0.3, fat: 0.35 },
@@ -80,7 +124,7 @@ function displayMacronutrients(caloricNeeds, mode) {
   const calculatedTotalCalories = Math.round(proteinGrams * 4 + carbGrams * 4 + fatGrams * 9);
 
   macroDiv.innerHTML = `
-    <h3>目標巨量營養素攝取量</h3>
+    <h3>目標三大營養素攝取量</h3>
     <div class="macro-item">蛋白質：${proteinGrams} 克</div>
     <div class="macro-item">碳水化合物：${carbGrams} 克</div>
     <div class="macro-item">脂肪：${fatGrams} 克</div>
@@ -88,30 +132,76 @@ function displayMacronutrients(caloricNeeds, mode) {
   `;
 }
 
+// 此函數現在將其區塊隱藏
 function displayFoodPortions(foodPortions) {
   const resultDiv = document.getElementById('food-portion-results');
+  resultDiv.style.display = 'none'; // 隱藏此區塊
   resultDiv.innerHTML = '';
-  if (foodPortions.length === 0) {
-    resultDiv.textContent = '請至少每類選一項食物。';
-    return;
-  }
-  resultDiv.innerHTML += '<h3>各食物建議份量</h3>'; // 新增標題
-  foodPortions.forEach(item => {
-    const div = document.createElement('div');
-    div.classList.add('food-result-item');
-    // 如果是警告訊息 (amount 為 0 且名稱包含 '⚠️')，則不顯示 '0 克'
-    if (item.amount === 0 && item.name.startsWith('⚠️')) {
-      div.textContent = `${item.name}`;
-    } else {
-      div.textContent = `${item.name} ${item.amount} 克`;
-    }
-    resultDiv.appendChild(div);
-  });
 }
 
-function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal) { // 新增 goal 參數
+// 新增一個函數來顯示單一食物來源的份量
+function displaySingleSourcePortions(selectedFoods, targetMacros) {
+    const singleSourceDiv = document.getElementById('single-source-portions');
+    singleSourceDiv.innerHTML = '<h3>若單一食物滿足目標營養素所需份量</h3>';
+    singleSourceDiv.style.display = 'block';
+
+    const nutrientMap = {
+        protein: "protein",
+        carbs: "carbs",
+        fat: "fat"
+    };
+
+    let hasResults = false;
+
+    // 檢查是否有任何食物被選中
+    const anyFoodSelected = Object.values(selectedFoods).some(arr => arr.length > 0);
+
+    if (!targetMacros || !anyFoodSelected) {
+        singleSourceDiv.innerHTML = '<p>請輸入個人資訊並選擇食物以查看單一食物所需份量。</p>';
+        return;
+    }
+
+    for (const group in selectedFoods) {
+        const foods = selectedFoods[group];
+        const key = nutrientMap[group];
+        const targetValue = targetMacros[key]; // 目標營養素的總克數
+
+        if (targetValue === 0) continue; // 如果目標為0，則跳過
+
+        foods.forEach(food => {
+            if (food[key] > 0) { // 確保該食物確實提供此營養素
+                const gramsNeeded = Math.round((targetValue * 100) / food[key]);
+                const div = document.createElement('div');
+                div.classList.add('food-result-item');
+                div.innerHTML = `<strong>${food.name}</strong> (${food.calories}大卡/100g): 若單獨滿足 ${group === 'protein' ? '蛋白質' : group === 'carbs' ? '碳水化合物' : '脂肪'} 目標，約需 <strong>${gramsNeeded} 克</strong>`;
+                singleSourceDiv.appendChild(div);
+                hasResults = true;
+            } else {
+                // 如果食物不提供該主要營養素，則顯示警告
+                const macroTypeMap = {
+                    protein: '蛋白質',
+                    carbs: '碳水化合物',
+                    fat: '脂肪'
+                };
+                const div = document.createElement('div');
+                div.classList.add('food-result-item');
+                div.style.color = 'orange';
+                div.innerHTML = `<strong>⚠️ ${food.name}</strong> 不含此類型主要營養素 ${macroTypeMap[key]}。`;
+                singleSourceDiv.appendChild(div);
+                hasResults = true;
+            }
+        });
+    }
+
+    if (!hasResults) {
+        singleSourceDiv.innerHTML = '<p>請選擇食物以查看單一食物所需份量。</p>';
+    }
+}
+
+
+function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal) {
   const result = [];
-  const actualMacros = { protein: 0, carbs: 0, fat: 0, totalCalories: 0 }; // 新增 totalCalories
+  const actualMacros = { protein: 0, carbs: 0, fat: 0, totalCalories: 0 };
   const nutrientMap = {
     protein: "protein",
     carbs: "carbs",
@@ -119,73 +209,30 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
   };
 
   const foodMaxLimit = {
-    // 脂肪類食物的建議上限 (高熱量密度，建議較低)
-    "沙拉醬": 60,
-    "油": 40, // 將油的基礎上限從 60 調整為 40
-    "腰果": 60,
-    "花生粉": 60,
-    "鮮奶油": 60,
-
-    // 蛋白質類食物的建議上限 (為增加差異性而細化)
-    "雞蛋": 100,       // 約2顆雞蛋
-    "鮪魚": 350,       // 考量單次主菜份量，略有差異
-    "花枝": 350,       // 份量可能略少於肉類
-    "一般魚類": 350,
-    "雞胸": 350,       // 雞胸肉通常可吃較多
-    "豬肝": 200,       // 內臟類份量通常較少
-    "雞腿": 350,
-    "牛肉": 350,
-    "雞蛋白": 200,     // 雞蛋白可大量攝取
-    "無糖豆漿": 500,   // 約500ml
-    "高蛋白": 60,     // 約2勺
-
-    // 碳水化合物類食物的建議上限 (細化)
-    "飯": 350,         // 一碗飯約150-200g，350g 為較大份量
-    "麥片": 100,       // 較為濃縮的碳水化合物
-    "拉麵": 400,
-    "馬鈴薯": 450,     // 澱粉根莖類可較多
-    "番薯": 450
+    "沙拉醬": 60, "鮮奶油": 60, "花生粉": 60, "腰果": 60, "油": 40,
+    "雞蛋": 100, "鮪魚": 350, "花枝": 350, "一般魚類": 350, "雞胸": 350, "豬肝": 200, "雞腿": 350, "牛肉": 350, "雞蛋白": 200, "無糖豆漿": 500, "高蛋白": 60,
+    "飯": 350, "麥片": 100, "拉麵": 400, "馬鈴薯": 450, "番薯": 450
   };
+  const DEFAULT_FOOD_LIMIT = 300;
+  const UNLIMITED_GRAMS = 99999;
 
-  // 預設食物上限，用於未在 foodMaxLimit 中特別指定的食物
-  const DEFAULT_FOOD_LIMIT = 300; 
-  const UNLIMITED_GRAMS = 99999; // 定義一個足夠大的數字，作為「無上限」
-
-  // --- 動態份量上限調整邏輯 ---
-  const TARGET_CALORIES_THRESHOLD_FOR_MODERATE_INCREASE = 2500; // 中度增加的熱量門檻
-  const TARGET_CALORIES_THRESHOLD_FOR_SIGNIFICANT_INCREASE = 3500; // 顯著增加的熱量門檻
-
-  let generalLimitMultiplier = 1; // 預設通用乘數為 1
-
+  const TARGET_CALORIES_THRESHOLD_FOR_MODERATE_INCREASE = 2500;
+  const TARGET_CALORIES_THRESHOLD_FOR_SIGNIFICANT_INCREASE = 3500;
+  let generalLimitMultiplier = 1;
   if (targetMacros.total > TARGET_CALORIES_THRESHOLD_FOR_SIGNIFICANT_INCREASE) {
-      generalLimitMultiplier = 1.7; // 如果總熱量非常高，通用上限提高 70%
+      generalLimitMultiplier = 1.7;
   } else if (targetMacros.total > TARGET_CALORIES_THRESHOLD_FOR_MODERATE_INCREASE) {
-      generalLimitMultiplier = 1.3; // 如果總熱量較高，通用上限提高 30%
+      generalLimitMultiplier = 1.3;
   }
 
-  // 食物角色分類 (主食 vs 配菜/輔助)
   const foodRoleMap = {
-      // 主食類的蛋白質 (通常是主要肉品)
       "雞胸": 'main', "雞腿": 'main', "牛肉": 'main', "鮪魚": 'main', "一般魚類": 'main',
-      // 配菜或輔助類的蛋白質 (通常份量較小或作為補充)
       "花枝": 'side', "豬肝": 'side', "雞蛋白": 'side', "無糖豆漿": 'side', "雞蛋": 'side', "高蛋白": 'side',
-
-      // 主食類的碳水化合物
       "飯": 'main', "拉麵": 'main', "馬鈴薯": 'main', "番薯": 'main',
-      // 配菜類的碳水化合物 (或份量相對較少的主食)
-      "麥片": 'side', 
-
-      // 脂肪通常是配菜/調味
+      "麥片": 'side',
       "沙拉醬": 'side', "鮮奶油": 'side', "花生粉": 'side', "腰果": 'side', "油": 'side'
   };
-
-  // 根據食物角色給予不同的額外份量彈性
-  const roleBasedMultiplier = {
-      main: 1.1, // 主食類在通用乘數基礎上再額外放寬 10%
-      side: 0.9  // 配菜類在通用乘數基礎上略為限制 10%
-  };
-  // --- 動態份量上限調整邏輯結束 ---
-
+  const roleBasedMultiplier = { main: 1.1, side: 0.9 };
 
   for (const group in selectedFoods) {
     const foods = selectedFoods[group];
@@ -194,13 +241,8 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
     const totalValue = foods.reduce((sum, food) => sum + food[key], 0);
 
     foods.forEach(food => {
-      // 避免除以零
       if (food[key] === 0) {
-        const macroTypeMap = {
-            protein: '蛋白質',
-            carbs: '碳水化合物',
-            fat: '脂肪'
-        };
+        const macroTypeMap = { protein: '蛋白質', carbs: '碳水化合物', fat: '脂肪' };
         result.push({ name: `⚠️ ${food.name} 不提供 ${macroTypeMap[key]}，請選擇其他食物。`, amount: 0 });
         return;
       }
@@ -208,94 +250,67 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
       const ratio = food[key] / totalValue;
       let gram = (totalNeed * 100 * ratio) / food[key];
 
-      // 獲取食物的角色
-      const foodRole = foodRoleMap[food.name] || 'main'; 
-      let currentFoodLimit; // 最終的單一食物上限
+      const foodRole = foodRoleMap[food.name] || 'main';
+      let currentFoodLimit;
 
-      // --- 根據碳水比例和食物角色調整上限 ---
       if (foodRole === 'main' && key === 'protein') {
-          // 主菜類蛋白質
           if (carbType === 'low' || carbType === 'medium') {
-              // 低/中碳飲食下，主菜蛋白質無上限
               currentFoodLimit = UNLIMITED_GRAMS;
           } else {
-              // 高碳飲食下，主菜蛋白質仍受總熱量和角色乘數影響
               const baseLimit = foodMaxLimit[food.name] || DEFAULT_FOOD_LIMIT;
               const finalLimitMultiplier = generalLimitMultiplier * (roleBasedMultiplier[foodRole] || 1);
               currentFoodLimit = Math.round(baseLimit * finalLimitMultiplier);
           }
       } else if (foodRole === 'main' && key === 'carbs') {
-          // 主食類碳水
           const baseLimit = foodMaxLimit[food.name] || DEFAULT_FOOD_LIMIT;
           let carbSpecificMultiplier = 1;
           if (carbType === 'high') {
-              carbSpecificMultiplier = 1.5; // 高碳飲食下，主食碳水上限再額外放寬 50%
+              carbSpecificMultiplier = 1.5;
           } else if (carbType === 'medium') {
-              carbSpecificMultiplier = 1.2; // 中碳飲食下，主食碳水上限放寬 20%
+              carbSpecificMultiplier = 1.2;
           }
           const finalLimitMultiplier = generalLimitMultiplier * (roleBasedMultiplier[foodRole] || 1) * carbSpecificMultiplier;
           currentFoodLimit = Math.round(baseLimit * finalLimitMultiplier);
       } else {
-          // 其他食物（配菜、脂肪等），沿用原來的動態上限邏輯
           const baseLimit = foodMaxLimit[food.name] || DEFAULT_FOOD_LIMIT;
           const finalLimitMultiplier = generalLimitMultiplier * (roleBasedMultiplier[foodRole] || 1);
           currentFoodLimit = Math.round(baseLimit * finalLimitMultiplier);
       }
-      // --- 上限調整邏輯結束 ---
-      
+
       gram = Math.min(gram, currentFoodLimit);
 
       result.push({ name: food.name, amount: Math.round(gram) });
       actualMacros[key] += (gram * food[key]) / 100;
-      // 計算實際總熱量
-      actualMacros.totalCalories += (gram * food.calories) / 100; // 新增這行
+      actualMacros.totalCalories += (gram * food.calories) / 100;
     });
 
-    const macroTypeMap = {
-        protein: '蛋白質',
-        carbs: '碳水化合物',
-        fat: '脂肪'
-    };
-
+    const macroTypeMap = { protein: '蛋白質', carbs: '碳水化合物', fat: '脂肪' };
     if (actualMacros[key] < totalNeed * 0.85 && totalNeed > 0) {
       result.push({ name: `⚠️ ${macroTypeMap[key]} 攝取不足，請考慮增加相關食物或調整目標。`, amount: 0 });
     }
   }
 
-  // --- 最終熱量精確調整 (強制總熱量符合目標，或在增重目標範圍內) ---
   const finalActualTotalCalories = Math.round(actualMacros.totalCalories);
-  const finalTargetTotalCalories = Math.round(targetMacros.total); // TDEE + 500 或 TDEE - 500
-  const CALORIE_ADJUSTMENT_TOLERANCE = 20; // 允許的最終熱量誤差
+  const finalTargetTotalCalories = Math.round(targetMacros.total);
+  const CALORIE_ADJUSTMENT_TOLERANCE = 20;
 
-  // 只有當實際熱量與目標熱量偏差較大時才進行調整
   if (Math.abs(finalActualTotalCalories - finalTargetTotalCalories) > CALORIE_ADJUSTMENT_TOLERANCE) {
-      if (finalActualTotalCalories !== 0) { // 避免除以零
+      if (finalActualTotalCalories !== 0) {
           const adjustmentFactor = finalTargetTotalCalories / finalActualTotalCalories;
-          
-          // 應用調整因子到每個食物的份量
           result.forEach(item => {
-              // 只有當不是警告訊息且份量大於0時才調整
               if (item.amount > 0 && !item.name.startsWith('⚠️')) {
                   item.amount = Math.round(item.amount * adjustmentFactor);
               }
           });
 
-          // 重新計算實際巨量營養素和總熱量，因為份量已被調整
-          actualMacros.protein = 0;
-          actualMacros.carbs = 0;
-          actualMacros.fat = 0;
-          actualMacros.totalCalories = 0; // 重置以便重新計算
-
-          // 遍歷已調整份量的項目，重新計算三大營養素和總熱量
+          actualMacros.protein = 0; actualMacros.carbs = 0; actualMacros.fat = 0; actualMacros.totalCalories = 0;
           result.forEach(adjustedItem => {
-              if (adjustedItem.amount > 0 && !adjustedItem.name.startsWith('⚠️')) { // 排除警告訊息
-                  // 從 foodData 中找到原始食物數據
+              if (adjustedItem.amount > 0 && !adjustedItem.name.startsWith('⚠️')) {
                   let originalFood = null;
                   for (const category in foodData) {
                       originalFood = foodData[category].find(f => f.name === adjustedItem.name);
                       if (originalFood) break;
                   }
-
                   if (originalFood) {
                       actualMacros.protein += (adjustedItem.amount * originalFood.protein) / 100;
                       actualMacros.carbs += (adjustedItem.amount * originalFood.carbs) / 100;
@@ -306,24 +321,16 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
           });
       }
   }
-  // --- 最終熱量精確調整結束 ---
 
-  // --- 新增：迭代式三大營養素平衡調整 ---
-  const MAX_BALANCING_ITERATIONS = 20; // 調整次數
-  const ADJUSTMENT_STEP = 5; // 每次微調的克數
-  const MACRO_BALANCE_TOLERANCE_PERCENT = 10; // 允許三大營養素最終的百分比誤差
-
-  // 增重目標的熱量上限
+  const MAX_BALANCING_ITERATIONS = 20;
+  const ADJUSTMENT_STEP = 5;
+  const MACRO_BALANCE_TOLERANCE_PERCENT = 10;
   const GAIN_CALORIE_HARD_UPPER_LIMIT = 4000;
 
   let currentPortions = result.filter(item => item.amount > 0 && !item.name.startsWith('⚠️'))
-                              .map(item => ({ ...item })); // 複製一份並過濾掉警告和0份量
-  
-  // 由於在循環內部會持續計算和調整總熱量，這裡不再需要複製 actualMacros，
-  // 因為每次都會從 currentPortions 重新計算
+                              .map(item => ({ ...item }));
 
   for (let i = 0; i < MAX_BALANCING_ITERATIONS; i++) {
-    // 重新計算當前份量下的實際巨量營養素和總熱量
     let tempActualMacros = { protein: 0, carbs: 0, fat: 0, totalCalories: 0 };
     currentPortions.forEach(item => {
         let originalFood = null;
@@ -339,37 +346,31 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
         }
     });
 
-    // 計算當前巨量營養素的誤差百分比
     const currentErrors = {
       protein: targetMacros.protein !== 0 ? ((tempActualMacros.protein - targetMacros.protein) / targetMacros.protein) * 100 : 0,
       carbs: targetMacros.carbs !== 0 ? ((tempActualMacros.carbs - targetMacros.carbs) / targetMacros.carbs) * 100 : 0,
       fat: targetMacros.fat !== 0 ? ((tempActualMacros.fat - targetMacros.fat) / targetMacros.fat) * 100 : 0,
     };
 
-    // 檢查是否已達到足夠的平衡 (所有誤差都在容忍範圍內)
     if (Math.abs(currentErrors.protein) <= MACRO_BALANCE_TOLERANCE_PERCENT &&
         Math.abs(currentErrors.carbs) <= MACRO_BALANCE_TOLERANCE_PERCENT &&
         Math.abs(currentErrors.fat) <= MACRO_BALANCE_TOLERANCE_PERCENT) {
-      break; // 達到平衡，退出循環
+      break;
     }
 
-    // 進行調整：優先處理誤差最大的營養素
     const macroDeviations = [
       { type: 'protein', error: currentErrors.protein },
       { type: 'carbs', error: currentErrors.carbs },
       { type: 'fat', error: currentErrors.fat },
-    ].sort((a, b) => Math.abs(b.error) - Math.abs(a.error)); // 按誤差絕對值降序排列
+    ].sort((a, b) => Math.abs(b.error) - Math.abs(a.error));
 
-    let adjustedAny = false; // 標記本輪是否有任何調整
+    let adjustedAny = false;
 
     for (const dev of macroDeviations) {
       const type = dev.type;
       const error = dev.error;
 
-      // 如果該營養素過高
       if (error > MACRO_BALANCE_TOLERANCE_PERCENT) {
-        // 嘗試減少該營養素的食物份量
-        // 優先減少該營養素含量高且熱量密度高的食物 (如脂肪中的油)
         const foodsToAdjust = currentPortions
                                 .filter(item => {
                                     let originalFood = null;
@@ -379,7 +380,7 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
                                     }
                                     return originalFood && originalFood[type] > 0 && item.amount > 0;
                                 })
-                                .sort((a, b) => { // 嘗試基於營養素密度和熱量密度排序
+                                .sort((a, b) => {
                                     let foodA = null, foodB = null;
                                     for(const cat in foodData) {
                                         foodA = foodData[cat].find(f => f.name === a.name);
@@ -389,11 +390,9 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
                                         foodB = foodData[cat].find(f => f.name === b.name);
                                         if(foodB) break;
                                     }
-                                    // 優先減少單一高密度營養素食物 (如油)
-                                    if (type === 'fat' && a.name === '油') return -1; // 油排最前
+                                    if (type === 'fat' && a.name === '油') return -1;
                                     if (type === 'fat' && b.name === '油') return 1;
-                                    // 然後是該營養素密度高的食物 (每卡路里包含的該營養素更多)
-                                    return (foodB[type] / foodB.calories) - (foodA[type] / foodA.calories); 
+                                    return (foodB[type] / foodB.calories) - (foodA[type] / foodA.calories);
                                 });
 
 
@@ -402,13 +401,10 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
             if (amountToReduce > 0) {
                 item.amount -= amountToReduce;
                 adjustedAny = true;
-                break; // 每次只調整一種食物，避免過度調整
+                break;
             }
         }
-      } 
-      // 如果該營養素過低
-      else if (error < -MACRO_BALANCE_TOLERANCE_PERCENT) {
-        // 嘗試增加該營養素的食物份量
+      } else if (error < -MACRO_BALANCE_TOLERANCE_PERCENT) {
         const foodsToAdjust = currentPortions
                                 .filter(item => {
                                     let originalFood = null;
@@ -416,8 +412,7 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
                                         originalFood = foodData[category].find(f => f.name === item.name);
                                         if (originalFood) break;
                                     }
-                                    // 確保食物提供該營養素，且未達到其動態上限
-                                    const foodRole = foodRoleMap[item.name] || 'main'; 
+                                    const foodRole = foodRoleMap[item.name] || 'main';
                                     let baseLimit = foodMaxLimit[item.name] || DEFAULT_FOOD_LIMIT;
                                     let finalLimitMultiplier = generalLimitMultiplier * (roleBasedMultiplier[foodRole] || 1);
                                     if (foodRole === 'main' && type === 'carbs') {
@@ -432,7 +427,7 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
 
                                     return originalFood && originalFood[type] > 0 && item.amount < currentFoodLimit;
                                 })
-                                .sort((a, b) => { // 嘗試基於營養素密度排序，優先增加效率高的
+                                .sort((a, b) => {
                                     let foodA = null, foodB = null;
                                     for(const cat in foodData) {
                                         foodA = foodData[cat].find(f => f.name === a.name);
@@ -442,13 +437,12 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
                                         foodB = foodData[cat].find(f => f.name === b.name);
                                         if(foodB) break;
                                     }
-                                    return (foodB[type] / foodB.calories) - (foodA[type] / foodA.calories); // 密度高的優先
+                                    return (foodB[type] / foodB.calories) - (foodA[type] / foodA.calories);
                                 });
 
 
         for (const item of foodsToAdjust) {
-            // 需要重新計算該食物的動態上限，確保不會超限
-            const foodRole = foodRoleMap[item.name] || 'main'; 
+            const foodRole = foodRoleMap[item.name] || 'main';
             let baseLimit = foodMaxLimit[item.name] || DEFAULT_FOOD_LIMIT;
             let finalLimitMultiplier = generalLimitMultiplier * (roleBasedMultiplier[foodRole] || 1);
             if (foodRole === 'main' && type === 'carbs') {
@@ -460,22 +454,21 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
                 baseLimit = UNLIMITED_GRAMS;
             }
             const currentFoodLimit = Math.round(baseLimit * finalLimitMultiplier);
-            
+
             const amountToAdd = Math.min(ADJUSTMENT_STEP, currentFoodLimit - item.amount);
             if (amountToAdd > 0) {
                 item.amount += amountToAdd;
                 adjustedAny = true;
-                break; // 每次只調整一種食物
+                break;
             }
         }
       }
     }
 
-    if (!adjustedAny) { // 如果本輪沒有任何調整，說明無法再優化了
+    if (!adjustedAny) {
         break;
     }
 
-    // 每次調整後，重新確保總熱量符合目標 (這很重要，因為單一營養素調整會影響總熱量)
     let tempTotalCaloriesAfterMacroAdjust = 0;
     currentPortions.forEach(item => {
         let originalFood = null;
@@ -489,36 +482,28 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
     });
 
     if (tempTotalCaloriesAfterMacroAdjust !== 0) {
-        let desiredTotalForReAdjust = finalTargetTotalCalories; // 預設目標為 TDEE +/- 500
+        let desiredTotalForReAdjust = finalTargetTotalCalories;
 
-        // *** 增重目標的熱量彈性邏輯 ***
         if (goal === 'gain') {
             const currentTotal = tempTotalCaloriesAfterMacroAdjust;
-            // 如果當前熱量已經在目標範圍內 (例如 3462.69 到 4000)
             if (currentTotal >= finalTargetTotalCalories - CALORIE_ADJUSTMENT_TOLERANCE && currentTotal <= GAIN_CALORIE_HARD_UPPER_LIMIT) {
-                desiredTotalForReAdjust = currentTotal; // 允許它保持在這個較高但合規的熱量上
+                desiredTotalForReAdjust = currentTotal;
             } else if (currentTotal > GAIN_CALORIE_HARD_UPPER_LIMIT) {
-                desiredTotalForReAdjust = GAIN_CALORIE_HARD_UPPER_LIMIT; // 如果超過硬上限，則拉回到硬上限
+                desiredTotalForReAdjust = GAIN_CALORIE_HARD_UPPER_LIMIT;
             }
-            // 如果低於 finalTargetTotalCalories - tolerance，則 desiredTotalForReAdjust 仍為 finalTargetTotalCalories，會將其拉升
         }
-        // *** 增重目標的熱量彈性邏輯結束 ***
-
         const reAdjustmentFactor = desiredTotalForReAdjust / tempTotalCaloriesAfterMacroAdjust;
         currentPortions.forEach(item => {
-            if (item.amount > 0) { // 只調整實際有份量的食物
+            if (item.amount > 0) {
                 item.amount = Math.round(item.amount * reAdjustmentFactor);
             }
         });
     }
   }
 
-  // 將最終的調整結果賦值給 result 和 actualMacros
-  // 清空原始 result 中的食物項目，並添加調整後的 items
-  result.splice(0, result.length); // 清空現有結果（不包括警告，警告會後續添加）
-  currentPortions.forEach(item => result.push(item)); // 添加所有調整後的食物
+  result.splice(0, result.length);
+  currentPortions.forEach(item => result.push(item));
 
-  // 將最初因「不提供某種營養素」而生成的警告訊息重新加入
   const initialWarnings = [];
   for (const group in selectedFoods) {
       const foods = selectedFoods[group];
@@ -527,22 +512,17 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
       foods.forEach(food => {
           if (food[key] === 0) {
               const warning = `⚠️ ${food.name} 不提供 ${macroTypeMap[key]}，請選擇其他食物。`;
-              // 避免重複添加相同的警告
               if (!initialWarnings.some(w => w.name === warning)) {
                   initialWarnings.push({ name: warning, amount: 0 });
               }
           }
       });
   }
-  result.push(...initialWarnings); // 將警告添加到結果中
+  result.push(...initialWarnings);
 
-  // 最後再計算一次 actualMacros，確保它是最終結果
-  actualMacros.protein = 0;
-  actualMacros.carbs = 0;
-  actualMacros.fat = 0;
-  actualMacros.totalCalories = 0;
+  actualMacros.protein = 0; actualMacros.carbs = 0; actualMacros.fat = 0; actualMacros.totalCalories = 0;
   result.forEach(item => {
-    if (item.amount > 0 && !item.name.startsWith('⚠️')) { // 排除警告訊息
+    if (item.amount > 0 && !item.name.startsWith('⚠️')) {
         let originalFood = null;
         for (const category in foodData) {
             originalFood = foodData[category].find(f => f.name === item.name);
@@ -557,187 +537,51 @@ function calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal
     }
   });
 
-// --- 迭代式三大營養素平衡調整結束 ---
-
   return { portions: result, actualMacros };
 }
 
 
-function evaluateMacronutrientMatch(actual, target, goal) { // 新增 goal 參數
-  const errors = {};
-  errors.protein = target.protein !== 0 ? Math.round(((actual.protein - target.protein) / target.protein) * 100) : 0;
-  errors.carbs = target.carbs !== 0 ? Math.round(((actual.carbs - target.carbs) / target.carbs) * 100) : 0;
-  errors.fat = target.fat !== 0 ? Math.round(((actual.fat - target.fat) / target.fat) * 100) : 0;
-  return errors;
-}
-
-// 修改 displayEvaluation 函數，顯示實際值
+// 此函數現在將其區塊隱藏
 function displayEvaluation(errors, targetMacros, actualMacros, goal) {
   const summary = document.getElementById("balance-summary");
-  summary.innerHTML = ''; // 清空原有內容
-  let html = "<h3>實際巨量營養素攝取量</h3>";
-  html += "<ul style='padding-left:1em;'>";
-  html += `<li class="macro-item">蛋白質：${Math.round(actualMacros.protein)} 克 (目標: ${Math.round(targetMacros.protein)} 克)</li>`;
-  html += `<li class="macro-item">碳水化合物：${Math.round(actualMacros.carbs)} 克 (目標: ${Math.round(targetMacros.carbs)} 克)</li>`;
-  html += `<li class="macro-item">脂肪：${Math.round(actualMacros.fat)} 克 (目標: ${Math.round(targetMacros.fat)} 克)</li>`;
-  html += `<li class="macro-item"><strong>總熱量：${Math.round(actualMacros.totalCalories)} 大卡 (目標: ${Math.round(targetMacros.total)} 大卡)</strong></li>`;
-  html += "</ul>";
-
-  // --- 熱量目標達成檢查 ---
-  const actualTotalCalories = Math.round(actualMacros.totalCalories);
-  const targetTotalCalories = Math.round(targetMacros.total); // TDEE +/- 500
-  const calorieDifference = actualTotalCalories - targetTotalCalories;
-  const tolerance = 20; // 允許的熱量偏差容忍度
-
-  html += "<h3>熱量目標達成狀況</h3>";
-  html += "<ul style='padding-left:1em;'>";
-
-  if (goal === 'lose') {
-    // 減重目標：實際熱量應等於或低於目標
-    if (calorieDifference > tolerance) { // 實際熱量顯著高於目標，發出警告
-      html += `<li style='color: red;'><strong>⚠️ 警告：您的實際總熱量 (${actualTotalCalories} 大卡) 超出了減重目標熱量 (${targetTotalCalories} 大卡) 約 ${calorieDifference} 大卡。</strong></li>`;
-      html += `<li>為了有效減重，您需要嚴格保持熱量赤字。請考慮：</li>`;
-      html += `<ul><li>減少所選食物的份量，特別是脂肪類食物。</li><li>重新選擇熱量密度較低的食物。</li><li>調整您的巨量營養素比例設定。</li></ul>`;
-    } else { // 實際熱量等於或低於目標，符合減重需求
-      html += `<li>✅ 您的實際總熱量 (${actualTotalCalories} 大卡) 符合減重目標，甚至更低（目標: ${targetTotalCalories} 大卡），有利於體重下降。</li>`;
-    }
-  } else if (goal === 'gain') {
-    // 增重目標：實際熱量應等於或高於 TDEE + 500 大卡，且不超過 4000 大卡
-    const GAIN_CALORIE_HARD_UPPER_LIMIT = targetTotalCalories+500; // 增重目標的熱量硬上限
-
-    if (actualTotalCalories < targetTotalCalories - tolerance) { // 實際熱量顯著低於目標（TDEE+500），發出警告
-      html += `<li style='color: red;'><strong>⚠️ 警告：您的實際總熱量 (${actualTotalCalories} 大卡) 低於增重目標熱量 (${targetTotalCalories} 大卡) 約 ${-calorieDifference} 大卡。</strong></li>`;
-      html += `<li>為了有效增重，您需要確保熱量攝取充足。請考慮：</li>`;
-      html += `<ul><li>增加所選食物的份量，特別是主食和蛋白質。</li><li>重新選擇熱量密度較高的食物。</li><li>調整您的巨量營養素比例設定。</li></ul>`;
-    } else if (actualTotalCalories > GAIN_CALORIE_HARD_UPPER_LIMIT + tolerance) { // 實際熱量顯著高於 4000 大卡上限，發出警告
-      html += `<li style='color: orange;'>⚠️ 您的實際總熱量 (${actualTotalCalories} 大卡) 超出了建議的增重上限（${GAIN_CALORIE_HARD_UPHEN_LIMIT} 大卡）。</li>`;
-      html += `<li>雖然增重需要熱量盈餘，但過度攝取可能導致不必要的脂肪增加。請考慮：</li>`;
-      html += `<ul><li>稍微減少所選食物的份量。</li><li>重新評估您的巨量營養素比例設定。</li></ul>`;
-    }
-    else { // 實際熱量在 TDEE+500 到 4000 之間（或略有浮動），符合增重需求
-      html += `<li>✅ 您的實際總熱量 (${actualTotalCalories} 大卡) 符合增重目標，甚至更高（目標: ${targetTotalCalories} 大卡，建議上限 ${GAIN_CALORIE_HARD_UPPER_LIMIT} 大卡），有利於體重增加。</li>`;
-    }
-  } else { // Maintain
-    if (Math.abs(calorieDifference) > tolerance * 2) { // 稍微放寬維持目標的容忍度
-      html += `<li style='color: orange;'>⚠️ 您的實際總熱量 (${actualTotalCalories} 大卡) 與維持目標熱量 (${targetTotalCalories} 大卡) 存在 ${Math.abs(calorieDifference)} 大卡的偏差。</li>`;
-      html += `<li>如果您需要更精確地維持體重，請考慮調整食物份量。</li>`;
-    } else {
-      html += `<li>✅ 您的實際總熱量 (${actualTotalCalories} 大卡) 符合維持目標 (${targetTotalCalories} 大卡)。</li>`;
-    }
-  }
-  html += "</ul>";
-  // --- 熱量目標達成檢查結束 ---
-
-
-  html += "<h3>各營養素與目標的誤差</h3>";
-  html += "<ul style='padding-left:1em;'>";
-  const warnList = [];
-
-  const assess = (val, name, key) => {
-    // val 是計算出來的百分比誤差，有正負號
-    if (Math.abs(val) <= 10) {
-      html += `<li>✅ ${name} 接近目標（誤差 ${val}%）</li>`;
-    } else if (val > 10) { // 誤差為正且大於 10，表示過高
-      html += `<li>⚠️ ${name} 過高（+${val}%）。考慮減少相關食物份量。`;
-      if (key === 'fat') {
-          html += `<strong style='color: red;'> 特別是高熱量密度的油、沙拉醬、堅果等。</strong>`;
-      }
-      html += `</li>`;
-      if (val > 30) warnList.push(key); // 誤差超過 30% 納入嚴重警告列表
-    } else { // 誤差為負且小於 -10 (因為不是 Math.abs <= 10 也不是 val > 10)，表示過低
-      html += `<li>⚠️ ${name} 過低（${val}%）。考慮增加相關食物份量。</li>`;
-      if (val < -30) warnList.push(key); // 誤差低於 -30% 納入嚴重警告列表
-    }
-  };
-
-  assess(errors.protein, "蛋白質", "protein");
-  assess(errors.carbs, "碳水化合物", "carbs");
-  assess(errors.fat, "脂肪", "fat");
-  html += "</ul>";
-
-  // --- 特定不平衡警告 (脂肪過高但蛋白/碳水不足) ---
-  const hasHighFat = errors.fat > 15; // 脂肪偏差超過 15% 視為過高
-  const hasLowProtein = errors.protein < -15; // 蛋白質偏差低於 -15% 視為不足
-  const hasLowCarbs = errors.carbs < -15; // 碳水化合物偏差低於 -15% 視為不足
-
-  if (hasHighFat && (hasLowProtein || hasLowCarbs)) {
-      html += "<p style='color: red; font-weight: bold;'>🚨 嚴重不平衡警告：您的脂肪攝取量過高，但同時蛋白質或碳水化合物攝取量不足！</p>";
-      html += "<ul>";
-      html += "<li>這會嚴重影響您的健康和減重/增重目標。強烈建議您：</li>";
-      html += "<ul>";
-      html += "<li><strong>大幅減少高脂肪食物（如油、沙拉醬、腰果等）的份量。</strong></li>";
-      html += "<li>增加蛋白質（如雞胸肉、魚類、豆漿）和碳水化合物（如米飯、馬鈴薯、番薯）的攝取。</li>";
-      html += "<li>重新檢查您的食物選擇，確保各類食物均衡。</li>";
-      html += "<li>如果問題持續，請考慮調整您的巨量營養素比例設定。</li>";
-      html += "</ul>";
-      html += "</ul>";
-  }
-  // --- 特定不平衡警告結束 ---
-
-
-  if (warnList.length > 0) {
-    html += "<p><strong>調整建議：</strong></p>";
-    html += "<ul>";
-    if (warnList.includes('protein')) {
-      html += "<li>您的蛋白質攝取量與目標差距較大，請檢查所選蛋白質食物的份量或考慮選擇更多不同種類的蛋白質來源。</li>";
-    }
-    if (warnList.includes('carbs')) {
-      html += "<li>您的碳水化合物攝取量與目標差距較大，請檢查所選碳水食物的份量或考慮調整碳水類型 (低/中/高)。</li>";
-    }
-    if (warnList.includes('fat')) {
-      html += "<li>您的脂肪攝取量與目標差距較大，特別是如果脂肪過高，請<strong style='color: red;'>務必注意減少高熱量密度的油、沙拉醬、堅果等份量</strong>，或替換為脂肪含量較低的食材。</li>";
-    }
-    html += "<li>如果持續難以達成目標，您可能需要：</li>";
-    html += "<ul>";
-    html += "<li>選擇更多不同種類的食物，以提供更豐富的營養素來源。</li>";
-    html += "<li>重新評估您的熱量需求或巨量營養素比例設定。</li>";
-    html += "</ul>";
-    html += "</ul>";
-  } else {
-    html += "<p>您的飲食巨量營養素比例良好，請繼續保持！</p>";
-  }
-
-  summary.innerHTML = html;
-  summary.style.display = "block";
+  summary.style.display = "none"; // 隱藏此區塊
+  summary.innerHTML = '';
 }
 
-const form = document.getElementById('calculator-form');
-form.addEventListener('submit', function (event) {
-  event.preventDefault();
-  document.getElementById('results').style.display = 'block';
-  const summaryDiv = document.getElementById('balance-summary');
-  if (summaryDiv) summaryDiv.style.display = "none"; // 隱藏舊的評估區塊
+// 核心計算與渲染邏輯
+function calculateAndRender() {
+  const weightInput = document.getElementById('weight');
+  const heightInput = document.getElementById('height');
+  const ageInput = document.getElementById('age');
+  const genderInput = document.querySelector('input[name="gender"]:checked');
+  const activityLevelInput = document.getElementById('activity-level');
+  const goalInput = document.getElementById('goal');
+  const carbTypeInput = document.getElementById('carb-type');
 
-  const weight = parseFloat(document.getElementById('weight').value);
-  const height = parseFloat(document.getElementById('height').value);
-  const age = parseFloat(document.getElementById('age').value);
-  const gender = document.querySelector('input[name="gender"]:checked').value;
-  const activityLevel = parseFloat(document.getElementById('activity-level').value);
-  const goal = document.getElementById('goal').value;
-  const carbType = document.getElementById('carb-type').value;
+  const weight = parseFloat(weightInput.value);
+  const height = parseFloat(heightInput.value);
+  const age = parseFloat(ageInput.value);
+  const gender = genderInput ? genderInput.value : null;
+  const activityLevel = parseFloat(activityLevelInput.value);
+  const goal = goalInput.value;
+  const carbType = carbTypeInput.value;
 
-  const tdee = calculateTDEE(weight, height, age, gender, activityLevel);
-  const caloricNeeds = calculateCaloricNeeds(tdee, goal);
-  document.getElementById('tdee-result').textContent = `TDEE: ${tdee.toFixed(2)} 大卡`;
-  document.getElementById('caloric-needs-result').textContent = `熱量需求: ${caloricNeeds.toFixed(2)} 大卡`;
-
-  const selectedProteins = Array.from(document.querySelectorAll('#protein-food input:checked')).map(input =>
-    foodData.protein.find(f => f.name === input.value));
-  const selectedCarbs = Array.from(document.querySelectorAll('#carb-food input:checked')).map(input =>
-    foodData.carbs.find(f => f.name === input.value));
-  const selectedFats = Array.from(document.querySelectorAll('#fat-food input:checked')).map(input =>
-    foodData.fat.find(f => f.name === input.value));
-
-  if (!selectedProteins.length || !selectedCarbs.length || !selectedFats.length) {
-    alert("請至少每類選擇一種食物（碳水、蛋白質、脂肪）");
+  // 確保所有必要輸入都有值且有效，才能進行計算和顯示結果
+  if (isNaN(weight) || isNaN(height) || isNaN(age) || !gender || isNaN(activityLevel) || weight <= 0 || height <= 0 || age <= 0) {
+    document.getElementById('results').style.display = 'none'; // 隱藏結果區塊
+    document.getElementById('tdee-result').textContent = '';
+    document.getElementById('caloric-needs-result').textContent = '';
+    // 即使數據不完整，也需要載入食物選項，但沒有單一營養素需求資訊
+    loadFoodOptions(null);
     return;
   }
 
-  const selectedFoods = {
-    protein: selectedProteins,
-    carbs: selectedCarbs,
-    fat: selectedFats
-  };
+  const tdee = calculateTDEE(weight, height, age, gender, activityLevel);
+  const caloricNeeds = calculateCaloricNeeds(tdee, goal);
+
+  document.getElementById('tdee-result').textContent = `TDEE: ${tdee.toFixed(2)} 大卡`;
+  document.getElementById('caloric-needs-result').textContent = `熱量需求: ${caloricNeeds.toFixed(2)} 大卡`;
+  document.getElementById('results').style.display = 'block'; // 顯示結果區塊
 
   const macroRatios = {
     low: { carbs: 0.2, protein: 0.4, fat: 0.4 },
@@ -745,21 +589,81 @@ form.addEventListener('submit', function (event) {
     high: { carbs: 0.5, protein: 0.3, fat: 0.2 }
   };
 
-  const target = macroRatios[carbType];
+  const targetRatio = macroRatios[carbType];
   const targetMacros = {
     total: caloricNeeds,
-    protein: caloricNeeds * target.protein / 4,
-    carbs: caloricNeeds * target.carbs / 4,
-    fat: caloricNeeds * target.fat / 9
+    protein: caloricNeeds * targetRatio.protein / 4,
+    carbs: caloricNeeds * targetRatio.carbs / 4,
+    fat: caloricNeeds * targetRatio.fat / 9
   };
 
-  const { portions, actualMacros } = calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal); // 傳遞 carbType 和 goal
-  const errors = evaluateMacronutrientMatch(actualMacros, targetMacros, goal); // 傳遞 goal
+  // 重新載入食物選項，並傳入目標營養素以顯示「滿足單一營養素需求」
+  loadFoodOptions(targetMacros);
 
-  // 調整顯示順序
-  displayMacronutrients(caloricNeeds, carbType); // 顯示目標值
-  displayEvaluation(errors, targetMacros, actualMacros, goal); // 顯示實際值和評估
-  displayFoodPortions(portions); // 顯示食物份量
+  // 顯示目標三大營養素攝取量
+  displayMacronutrients(caloricNeeds, carbType);
+
+  // 獲取當前選中的食物
+  const selectedProteins = Array.from(document.querySelectorAll('#protein-food input:checked')).map(input =>
+    foodData.protein.find(f => f.name === input.value));
+  const selectedCarbs = Array.from(document.querySelectorAll('#carb-food input:checked')).map(input =>
+    foodData.carbs.find(f => f.name === input.value));
+  const selectedFats = Array.from(document.querySelectorAll('#fat-food input:checked')).map(input =>
+    foodData.fat.find(f => f.name === input.value));
+
+  const selectedFoods = {
+    protein: selectedProteins,
+    carbs: selectedCarbs,
+    fat: selectedFats
+  };
+
+  // 即使其他兩個顯示區塊被隱藏，我們仍可能需要這些計算結果
+  // 如果有選中的食物，才執行完整的食物份量計算，避免空選單報錯
+  if (selectedProteins.length > 0 || selectedCarbs.length > 0 || selectedFats.length > 0) {
+      const { portions, actualMacros } = calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal);
+      // 雖然 displayFoodPortions 和 displayEvaluation 被隱藏，但可以保留它們的調用
+      displayFoodPortions(portions); // 保持調用但函數內部會隱藏
+      // const errors = evaluateMacronutrientMatch(actualMacros, targetMacros, goal); // 評估函數依然存在，但其顯示函數被隱藏
+      // displayEvaluation(errors, targetMacros, actualMacros, goal); // 保持調用但函數內部會隱藏
+  } else {
+      // 如果沒有選中食物，確保單一來源份量區塊被清空或隱藏
+      document.getElementById('single-source-portions').style.display = 'none';
+  }
+
+  // 顯示單一食物滿足目標營養素所需份量
+  displaySingleSourcePortions(selectedFoods, targetMacros);
+}
+
+
+// 在 DOM 內容完全載入後執行
+document.addEventListener('DOMContentLoaded', () => {
+  // 頁面載入時執行一次計算和渲染，以顯示預設值
+  calculateAndRender();
+
+  // 監聽所有相關輸入欄位的變化事件，觸發即時計算和渲染
+  document.getElementById('weight').addEventListener('input', calculateAndRender);
+  document.getElementById('height').addEventListener('input', calculateAndRender);
+  document.getElementById('age').addEventListener('input', calculateAndRender);
+
+  document.querySelectorAll('input[name="gender"]').forEach(radio => {
+    radio.addEventListener('change', calculateAndRender);
+  });
+
+  document.getElementById('activity-level').addEventListener('change', calculateAndRender);
+  document.getElementById('goal').addEventListener('change', calculateAndRender);
+  document.getElementById('carb-type').addEventListener('change', calculateAndRender);
+
+  // 監聽食物選擇 (checkboxes) 的變化，因為這也會影響 calculateAndRender 中的 selectedFoods 邏輯
+  document.getElementById('protein-food').addEventListener('change', calculateAndRender);
+  document.getElementById('carb-food').addEventListener('change', calculateAndRender);
+  document.getElementById('fat-food').addEventListener('change', calculateAndRender);
+
+  // 移除原有的表單提交事件監聽器，因為現在是即時更新
+  const form = document.getElementById('calculator-form');
+  // 如果您之前有 form.addEventListener('submit', ...) 這樣的程式碼，請確保它被移除或不再觸發主要計算邏輯
+  // 由於我們將所有核心邏輯移入 calculateAndRender 並使用 input/change 事件，原有的 submit 監聽器會變得冗餘
+  form.addEventListener('submit', function(event) {
+    event.preventDefault(); // 防止表單真的提交，頁面刷新
+    // 這裡可以選擇性地調用 calculateAndRender()，但因為已經有即時更新，這行會是多餘的
+  });
 });
-
-loadFoodOptions();

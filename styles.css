@@ -3,6 +3,7 @@ body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
   padding: 20px;
+  margin: 0;
 }
 
 .container {
@@ -17,30 +18,46 @@ body {
 
 h1 {
   text-align: center;
+  color: #333;
+  font-size: 2.2em;
+}
+
+/* 確保圖片和標題在 h1 內部垂直居中 */
+h1 img {
+  vertical-align: middle;
 }
 
 /* ========== 表單元素 ========== */
 label {
   display: block;
   margin-top: 12px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
 }
 
-input,
-select,
-button {
+input[type="number"],
+select {
   width: 100%;
-  padding: 8px;
-  margin: 10px 0;
+  padding: 10px;
+  margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box;
+  box-sizing: border-box; /* 確保 padding 和 border 不會增加元素的總寬度 */
+  font-size: 1em;
 }
 
 button {
   background: #4CAF50;
   color: #fff;
-  font-size: 16px;
+  font-size: 1.1em;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto; /* 按鈕寬度根據內容調整 */
+  margin-top: 20px; /* 與上方元素的間距 */
 }
 
 button:hover {
@@ -50,44 +67,40 @@ button:hover {
 /* radio 與 checkbox 基本對齊 */
 input[type="radio"],
 input[type="checkbox"] {
-  vertical-align: middle;
-  margin-right: 6px;
+  width: auto; /* 讓 radio/checkbox 保持原有大小 */
+  margin-right: 8px;
+  vertical-align: middle; /* 垂直對齊文字 */
 }
 
 .inline-label {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 15px;
+  display: inline-block;
+  margin-right: 20px;
+  font-weight: normal; /* 不加粗 */
 }
 
-/* ========== 食材選項 (checkbox) ========== */
-.food-item {
-  display: flex;
-  align-items: center; /* 讓 checkbox 與文字垂直置中 */
-  gap: 10px;
-  margin: 8px 0;
+
+/* ========== 雙欄佈局 (計算器與結果區) ========== */
+.calculator-grid {
+  display: flex; /* 啟用 Flexbox */
+  flex-wrap: wrap; /* 允許在空間不足時換行 */
+  gap: 20px; /* 兩欄之間的間距 */
+  align-items: flex-start; /* 讓兩欄從頂部對齊 */
+  margin-top: 20px;
 }
 
-.food-item input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  transform: translateY(1px); /* 微調與文字對齊 */
-  margin: 0;
+#calculator-form {
+  flex: 1; /* 讓表單區塊佔用可用空間 */
+  min-width: 300px; /* 設定最小寬度，防止在小螢幕上過窄 */
+  padding: 20px;
+  background: #fdfdfd;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
 }
 
-.food-item label {
-  flex: 1;
-  font-size: 16px;
-  line-height: 1.5;
-  cursor: pointer;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
-
-/* ========== 結果區 (卡片) ========== */
 #results {
+  flex: 1; /* 讓結果區塊佔用可用空間，與表單並排 */
+  min-width: 300px; /* 設定最小寬度 */
   background: #fafafa;
   border: 1px solid #ddd;
   padding: 20px;
@@ -99,9 +112,44 @@ input[type="checkbox"] {
   font-size: 18px;
   margin: 10px 0;
   font-weight: 500;
+  color: #333;
 }
 
-/* 食材份量卡片 */
+h3 {
+  color: #4CAF50;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 5px;
+}
+
+h4 {
+  color: #666;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+/* 巨量營養素摘要 */
+#macro-summary {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #e9f5e9;
+  border-radius: 8px;
+  border: 1px solid #d4edda;
+  color: #333;
+}
+
+.macro-item {
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.macro-item strong {
+  font-weight: bold;
+}
+
+
+/* 食物份量卡片 (若有顯示) */
 #food-portion-results {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -117,54 +165,116 @@ input[type="checkbox"] {
   box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
   font-size: 16px;
   line-height: 1.5;
+  color: #444;
 }
 
-/* ========== 雙欄佈局 ========== */
-.calculator-grid {
+/* 單一食物滿足營養素需求區塊 */
+#single-source-portions {
+  margin-top: 25px;
+  padding: 15px;
+  background-color: #eaf6fa; /* 淺藍色背景 */
+  border-radius: 8px;
+  border: 1px solid #cce7f4; /* 藍色邊框 */
+  color: #333;
+}
+#single-source-portions h3 {
+    border-bottom-color: #5bc0de; /* 與背景相符的藍色 */
+}
+
+
+/* ========== 食材選項區塊 ========== */
+.food-options {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .05);
+}
+
+.food-options h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+  color: #36a2eb; /* 藍色標題 */
+  border-bottom-color: #36a2eb;
+}
+
+/* 食材選項的雙欄佈局 */
+.food-columns {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  gap: 20px; /* 欄位之間的間距 */
 }
 
-#calculator-form,
-#results {
-  flex: 1 1 48%;
-  box-sizing: border-box;
+.food-columns > div {
+  flex: 1; /* 讓兩個 div 平均分配寬度 */
 }
 
-/* ========== 響應式設計 for iPhone 14（390px） ========== */
-@media (max-width: 420px) {
+.food-columns h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+.food-group {
+  margin-bottom: 15px;
+}
+
+.food-item {
+  margin-bottom: 8px;
+  display: flex; /* 使用 flexbox 讓 checkbox 和 label 對齊 */
+  align-items: flex-start; /* 頂部對齊 */
+}
+
+.food-item input[type="checkbox"] {
+  margin-right: 8px;
+  flex-shrink: 0; /* 防止 checkbox 縮小 */
+  margin-top: 4px; /* 微調對齊 */
+}
+
+.food-item label {
+  display: block; /* 讓 label 佔據剩餘空間 */
+  margin-left: 0; /* 移除預設的 margin-left */
+  font-weight: normal; /* 不加粗 */
+  color: #333;
+  line-height: 1.4;
+}
+
+
+/* ========== 響應式設計 ========== */
+@media (max-width: 768px) {
+  .calculator-grid {
+    flex-direction: column; /* 在小螢幕上改為垂直堆疊 */
+  }
+
   #calculator-form,
   #results {
-    flex: 1 1 100%;
+    flex-basis: 100%; /* 在小螢幕上各自佔據 100% 寬度 */
+    min-width: unset; /* 移除最小寬度限制 */
   }
 
-  .food-item {
-    align-items: flex-start;
+  .food-columns {
+    flex-direction: column; /* 食材選項也改為垂直排列 */
+    gap: 0; /* 移除欄位間距 */
   }
 
-  .food-item input[type="checkbox"] {
-    margin-left: 3px;
-    transform: translateY(3px); /* 再微調小螢幕對齊 */
+  .food-columns > div {
+    margin-bottom: 20px; /* 為每個食物類別增加間距 */
   }
 
-  .food-item label {
-    font-size: 15px;
-    line-height: 1.4;
-  }
-
-  #food-portion-results {
-    grid-template-columns: 1fr;
+  h1 {
+    font-size: 1.8em;
   }
 }
 
-/* ========== 三大營養素顯示區塊 ========== */
-#macro-summary {
-  margin: 10px 0 20px;
-  padding: 12px 16px;
-  background-color: #eef8f6;
-  border-left: 5px solid #4CAF50;
-  border-radius: 6px;
-  font-size: 16px;
-  line-height: 1.6;
+@media (max-width: 480px) {
+  .container {
+    padding: 15px;
+  }
+  h1 {
+    font-size: 1.5em;
+  }
+  h1 img {
+    height: 80px;
+  }
 }
