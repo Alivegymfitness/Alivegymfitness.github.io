@@ -79,9 +79,11 @@
         <div id="results" style="display:none;">
         <p id="tdee-result"></p>
         <p id="caloric-needs-result"></p>
-
         <h3>三大營養素建議攝取量</h3>
         <div id="macro-summary"></div>
+        <h3>達成評估</h3>
+        <div id="balance-summary" style="display:none; background: #fef8e7; border-left: 5px solid orange; padding: 12px 16px; border-radius: 6px; font-size: 15px; line-height: 1.5;"></div>
+
 
         <h3>所需食材份數</h3>
         <div id="food-portion-results"></div>
@@ -89,6 +91,7 @@
 
     </div> <!-- /calculator-grid -->
   </div> <!-- /container -->
+  <script src="https://cdn.jsdelivr.net/npm/javascript-lp-solver@0.4.24/prod/solver.min.js"></script>
 
   <script src="script.js"></script>
 </body>
