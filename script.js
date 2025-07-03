@@ -566,13 +566,22 @@ function calculateAndRender() {
   const goal = goalInput.value;
   const carbType = carbTypeInput.value;
 
+  // 獲取顯示「份」結果的元素
+  const proteinServingsEl = document.getElementById('protein-target-servings');
+  const carbsServingsEl = document.getElementById('carbs-target-servings');
+  const fatServingsEl = document.getElementById('fat-target-servings');
+
   // 確保所有必要輸入都有值且有效，才能進行計算和顯示結果
   if (isNaN(weight) || isNaN(height) || isNaN(age) || !gender || isNaN(activityLevel) || weight <= 0 || height <= 0 || age <= 0) {
     document.getElementById('results').style.display = 'none'; // 隱藏結果區塊
     document.getElementById('tdee-result').textContent = '';
     document.getElementById('caloric-needs-result').textContent = '';
-    // 即使數據不完整，也需要載入食物選項，但沒有單一營養素需求資訊
-    loadFoodOptions(null);
+    loadFoodOptions(null); // Load options without single nutrient info
+
+    // 清空「份」顯示結果
+    if (proteinServingsEl) proteinServingsEl.textContent = '';
+    if (carbsServingsEl) carbsServingsEl.textContent = '';
+    if (fatServingsEl) fatServingsEl.textContent = '';
     return;
   }
 
@@ -597,10 +606,24 @@ function calculateAndRender() {
     fat: caloricNeeds * targetRatio.fat / 9
   };
 
+  // 更新「份」顯示結果
+  if (proteinServingsEl) {
+    const proteinServings = targetMacros.protein / 7;
+    proteinServingsEl.textContent = `(約 ${proteinServings.toFixed(1)} 份)`;
+  }
+  if (carbsServingsEl) {
+    const carbsServings = targetMacros.carbs / 15;
+    carbsServingsEl.textContent = `(約 ${carbsServings.toFixed(1)} 份)`;
+  }
+  if (fatServingsEl) {
+    const fatServings = targetMacros.fat / 4;
+    fatServingsEl.textContent = `(約 ${fatServings.toFixed(1)} 份)`;
+  }
+
   // 重新載入食物選項，並傳入目標營養素以顯示「滿足單一營養素需求」
   loadFoodOptions(targetMacros);
 
-  // 顯示目標三大營養素攝取量
+  // 顯示目標巨量營養素攝取量
   displayMacronutrients(caloricNeeds, carbType);
 
   // 獲取當前選中的食物
@@ -621,12 +644,8 @@ function calculateAndRender() {
   // 如果有選中的食物，才執行完整的食物份量計算，避免空選單報錯
   if (selectedProteins.length > 0 || selectedCarbs.length > 0 || selectedFats.length > 0) {
       const { portions, actualMacros } = calculateFoodPortionsSimple(selectedFoods, targetMacros, carbType, goal);
-      // 雖然 displayFoodPortions 和 displayEvaluation 被隱藏，但可以保留它們的調用
-      displayFoodPortions(portions); // 保持調用但函數內部會隱藏
-      // const errors = evaluateMacronutrientMatch(actualMacros, targetMacros, goal); // 評估函數依然存在，但其顯示函數被隱藏
-      // displayEvaluation(errors, targetMacros, actualMacros, goal); // 保持調用但函數內部會隱藏
+      displayFoodPortions(portions);
   } else {
-      // 如果沒有選中食物，確保單一來源份量區塊被清空或隱藏
       document.getElementById('single-source-portions').style.display = 'none';
   }
 

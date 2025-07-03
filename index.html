@@ -9,7 +9,7 @@
 <body>
 
   <div class="container" >
-
+    
     <div style="display: flex; justify-content: center; align-items: center; text-align: center;">
       <h1 style="display: flex; align-items: center; margin: 0;">
         <img src="亞樂-去背.png" style="height: 100px; margin-right: 10px;">
@@ -18,7 +18,7 @@
     </div>
 
     <div class="calculator-grid">
-
+      
       <form id="calculator-form">
         <label for="weight">體重 (kg):</label>
         <input type="number" id="weight" required>
@@ -66,9 +66,7 @@
       <div id="results" style="display:none;">
         <p id="tdee-result"></p>
         <p id="caloric-needs-result"></p>
-        <h3>三大營養素建議攝取量</h3>
         <div id="macro-summary"></div>
-
       </div>
 
     </div>
@@ -77,13 +75,13 @@
       <h3>食材選項</h3>
       <div class="food-columns">
         <div>
-          <h4>蛋白質</h4>
+          <h4>蛋白質 <span id="protein-target-servings" class="target-servings-display"></span></h4>
           <div id="protein-food" class="food-group"></div>
         </div>
         <div>
-          <h4>碳水化合物</h4>
+          <h4>碳水化合物 <span id="carbs-target-servings" class="target-servings-display"></span></h4>
           <div id="carb-food" class="food-group"></div>
-          <h4>脂肪</h4>
+          <h4>脂肪 <span id="fat-target-servings" class="target-servings-display"></span></h4>
           <div id="fat-food" class="food-group"></div>
         </div>
       </div>
