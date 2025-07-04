@@ -29,6 +29,11 @@ const foodData = {
   ]
 };
 
+// Define serving standards (grams of nutrient per serving)
+const PROTEIN_PER_SERVING_G = 7;
+const CARBS_PER_SERVING_G = 15;
+const FAT_PER_SERVING_G = 4;
+
 function calculateBMR(weight, height, age, gender) {
   return gender === 'male'
     ? 10 * weight + 6.25 * height - 5 * age + 5
@@ -64,39 +69,78 @@ function loadFoodOptions(targetMacros) {
       div.classList.add('food-item');
 
       let singleNutrientInfo = '';
-      let primaryNutrientGrams = 0;
-      let primaryNutrientLabel = '';
-      let primaryNutrientKey = '';
+      let displayGramsPerServing = '';
+      let caloriesPerServing = 0;
+      let proteinPerServing = 0;
+      let carbsPerServing = 0;
+      let fatPerServing = 0;
+
+      let primaryNutrientValueForServingCalc = 0;
+      let servingUnitName = '';
+      let targetNutrientGramsPerServing = 0; // The amount of the nutrient that constitutes one serving
+
+      if (category === 'protein') {
+        primaryNutrientValueForServingCalc = food.protein;
+        targetNutrientGramsPerServing = PROTEIN_PER_SERVING_G;
+        servingUnitName = '蛋白質';
+      } else if (category === 'carbs') {
+        primaryNutrientValueForServingCalc = food.carbs;
+        targetNutrientGramsPerServing = CARBS_PER_SERVING_G;
+        servingUnitName = '碳水化合物';
+      } else if (category === 'fat') {
+        primaryNutrientValueForServingCalc = food.fat;
+        targetNutrientGramsPerServing = FAT_PER_SERVING_G;
+        servingUnitName = '脂肪';
+      }
+
+      if (primaryNutrientValueForServingCalc > 0 && targetNutrientGramsPerServing > 0) {
+        // Calculate how many grams of this specific food make up one standard serving of its primary nutrient
+        const gramsOfFoodPerServing = (targetNutrientGramsPerServing / primaryNutrientValueForServingCalc) * 100;
+        displayGramsPerServing = `${Math.round(gramsOfFoodPerServing)} 克/份`;
+
+        // Calculate calories and other macronutrients for that amount of food
+        caloriesPerServing = (food.calories / 100) * gramsOfFoodPerServing;
+        proteinPerServing = (food.protein / 100) * gramsOfFoodPerServing;
+        carbsPerServing = (food.carbs / 100) * gramsOfFoodPerServing;
+        fatPerServing = (food.fat / 100) * gramsOfFoodPerServing;
+      } else {
+        displayGramsPerServing = '無法計算份量';
+      }
 
       if (targetMacros) { // 只有當 targetMacros 有值時才計算單一營養素需求
-        if (category === 'protein' && food.protein > 0) {
+        let primaryNutrientKey = '';
+        let primaryNutrientLabel = '';
+        let targetNutrientGramsTotal = 0;
+
+        if (category === 'protein') {
           primaryNutrientKey = 'protein';
           primaryNutrientLabel = '蛋白質';
-          primaryNutrientGrams = Math.round((targetMacros.protein * 100) / food.protein);
-        } else if (category === 'carbs' && food.carbs > 0) {
+          targetNutrientGramsTotal = targetMacros.protein;
+        } else if (category === 'carbs') {
           primaryNutrientKey = 'carbs';
           primaryNutrientLabel = '碳水化合物';
-          primaryNutrientGrams = Math.round((targetMacros.carbs * 100) / food.carbs);
-        } else if (category === 'fat' && food.fat > 0) {
+          targetNutrientGramsTotal = targetMacros.carbs;
+        } else if (category === 'fat') {
           primaryNutrientKey = 'fat';
           primaryNutrientLabel = '脂肪';
-          primaryNutrientGrams = Math.round((targetMacros.fat * 100) / food.fat);
+          targetNutrientGramsTotal = targetMacros.fat;
         }
 
-        if (primaryNutrientGrams > 0) {
-          singleNutrientInfo = `，約需 ${primaryNutrientGrams} 克`;
-        } else if (primaryNutrientKey && food[primaryNutrientKey] === 0) {
+        if (targetNutrientGramsTotal > 0 && targetNutrientGramsPerServing > 0) {
+          const servingsNeeded = Math.round(targetNutrientGramsTotal / targetNutrientGramsPerServing);
+          singleNutrientInfo = `，約需 ${servingsNeeded} 份`;
+        } else if (primaryNutrientValueForServingCalc === 0) {
           singleNutrientInfo = `，此食材不含主要${primaryNutrientLabel}`;
         }
       }
 
-      const proteinDisplay = food.protein > 0 ? `, 蛋白質:${food.protein}g` : '';
-      const carbsDisplay = food.carbs > 0 ? `, 碳水:${food.carbs}g` : '';
-      const fatDisplay = food.fat > 0 ? `, 脂肪:${food.fat}g` : '';
+      const proteinDisplay = proteinPerServing > 0 ? `, 蛋白質:${proteinPerServing.toFixed(1)}g` : '';
+      const carbsDisplay = carbsPerServing > 0 ? `, 碳水:${carbsPerServing.toFixed(1)}g` : '';
+      const fatDisplay = fatPerServing > 0 ? `, 脂肪:${fatPerServing.toFixed(1)}g` : '';
 
       div.innerHTML = `
         <label id="${idPrefix}-${food.name}" value="${food.name}" data-category="${category}">
-        <label for="${idPrefix}-${food.name}">${food.name} (每100克: ${food.calories} 大卡${proteinDisplay}${carbsDisplay}${fatDisplay})${singleNutrientInfo}</label>
+        <label for="${idPrefix}-${food.name}">${food.name} (${displayGramsPerServing}: ${caloriesPerServing.toFixed(1)} 大卡${proteinDisplay}${carbsDisplay}${fatDisplay})${singleNutrientInfo}</label>
       `;
       el.appendChild(div);
     });
@@ -146,9 +190,9 @@ function displaySingleSourcePortions(selectedFoods, targetMacros) {
     singleSourceDiv.style.display = 'block';
 
     const nutrientMap = {
-        protein: "protein",
-        carbs: "carbs",
-        fat: "fat"
+        protein: { key: "protein", label: "蛋白質", servingGram: PROTEIN_PER_SERVING_G },
+        carbs: { key: "carbs", label: "碳水化合物", servingGram: CARBS_PER_SERVING_G },
+        fat: { key: "fat", label: "脂肪", servingGram: FAT_PER_SERVING_G }
     };
 
     let hasResults = false;
@@ -163,17 +207,17 @@ function displaySingleSourcePortions(selectedFoods, targetMacros) {
 
     for (const group in selectedFoods) {
         const foods = selectedFoods[group];
-        const key = nutrientMap[group];
+        const { key, label, servingGram } = nutrientMap[group];
         const targetValue = targetMacros[key]; // 目標營養素的總克數
 
         if (targetValue === 0) continue; // 如果目標為0，則跳過
 
         foods.forEach(food => {
-            if (food[key] > 0) { // 確保該食物確實提供此營養素
-                const gramsNeeded = Math.round((targetValue * 100) / food[key]);
+            if (food[key] > 0 && servingGram > 0) { // 確保該食物確實提供此營養素且份量定義有效
+                const servingsNeeded = Math.round(targetValue / servingGram);
                 const div = document.createElement('div');
                 div.classList.add('food-result-item');
-                div.innerHTML = `<strong>${food.name}</strong> (${food.calories}大卡/100g): 若單獨滿足 ${group === 'protein' ? '蛋白質' : group === 'carbs' ? '碳水化合物' : '脂肪'} 目標，約需 <strong>${gramsNeeded} 克</strong>`;
+                div.innerHTML = `<strong>${food.name}</strong> (每100克: ${food.calories} 大卡, 蛋白質:${food.protein}g, 碳水:${food.carbs}g, 脂肪:${food.fat}g): 若單獨滿足 ${label} 目標，約需 <strong>${servingsNeeded} 份</strong>`;
                 singleSourceDiv.appendChild(div);
                 hasResults = true;
             } else {
@@ -608,15 +652,15 @@ function calculateAndRender() {
 
   // 更新「份」顯示結果
   if (proteinServingsEl) {
-    const proteinServings = targetMacros.protein / 7;
+    const proteinServings = targetMacros.protein / PROTEIN_PER_SERVING_G;
     proteinServingsEl.textContent = `(約 ${proteinServings.toFixed(1)} 份)`;
   }
   if (carbsServingsEl) {
-    const carbsServings = targetMacros.carbs / 15;
+    const carbsServings = targetMacros.carbs / CARBS_PER_SERVING_G;
     carbsServingsEl.textContent = `(約 ${carbsServings.toFixed(1)} 份)`;
   }
   if (fatServingsEl) {
-    const fatServings = targetMacros.fat / 4;
+    const fatServings = targetMacros.fat / FAT_PER_SERVING_G;
     fatServingsEl.textContent = `(約 ${fatServings.toFixed(1)} 份)`;
   }
 
