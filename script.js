@@ -126,12 +126,7 @@ function loadFoodOptions(targetMacros) {
           targetNutrientGramsTotal = targetMacros.fat;
         }
 
-        if (targetNutrientGramsTotal > 0 && targetNutrientGramsPerServing > 0) {
-          const servingsNeeded = Math.round(targetNutrientGramsTotal / targetNutrientGramsPerServing);
-          singleNutrientInfo = `，約需 ${servingsNeeded} 份`;
-        } else if (primaryNutrientValueForServingCalc === 0) {
-          singleNutrientInfo = `，此食材不含主要${primaryNutrientLabel}`;
-        }
+
       }
 
       const proteinDisplay = proteinPerServing > 0 ? `, 蛋白質:${proteinPerServing.toFixed(1)}g` : '';
@@ -140,7 +135,7 @@ function loadFoodOptions(targetMacros) {
 
       div.innerHTML = `
         <label id="${idPrefix}-${food.name}" value="${food.name}" data-category="${category}">
-        <label for="${idPrefix}-${food.name}">${food.name} (${displayGramsPerServing}: ${caloriesPerServing.toFixed(1)} 大卡${proteinDisplay}${carbsDisplay}${fatDisplay})${singleNutrientInfo}</label>
+        <label for="${idPrefix}-${food.name}">${food.name} (${displayGramsPerServing}，每份含 ${caloriesPerServing.toFixed(1)} 大卡${proteinDisplay}${carbsDisplay}${fatDisplay})${singleNutrientInfo}</label>
       `;
       el.appendChild(div);
     });
