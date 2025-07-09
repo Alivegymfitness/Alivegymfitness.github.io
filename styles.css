@@ -277,4 +277,81 @@ h4 {
   h1 img {
     height: 80px;
   }
+  .food-exchange-table {
+    margin-top: 40px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.food-exchange-table h2,
+.food-exchange-table h3 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.food-exchange-table .instruction {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+.food-category {
+    margin-bottom: 30px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.food-category table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.food-category th,
+.food-category td {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.food-category th {
+    background-color: #eef;
+    font-weight: bold;
+    color: #555;
+}
+
+.food-category td input[type="number"] {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.total-summary {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #e6ffe6; /* 淺綠色背景 */
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.total-summary p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.total-summary span {
+    color: #007bff; /* 藍色顯示數值 */
+}
 }

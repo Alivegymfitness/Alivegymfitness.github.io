@@ -5,11 +5,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>飲食計算器</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ========== 食物代換表專用樣式 (從之前的對話中提供) ========== */
+    .food-exchange-table {
+        margin-top: 40px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    .food-exchange-table h2,
+    .food-exchange-table h3 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .food-exchange-table .instruction {
+        text-align: center;
+        color: #666;
+        margin-bottom: 25px;
+        font-style: italic;
+    }
+
+    .food-category {
+        margin-bottom: 30px;
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .food-category table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .food-category th,
+    .food-category td {
+        border: 1px solid #e0e0e0;
+        padding: 10px;
+        text-align: center;
+        font-size: 0.9em;
+    }
+
+    .food-category th {
+        background-color: #eef;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .food-category td input[type="number"] {
+        width: 60px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .total-summary {
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #e6ffe6; /* 淺綠色背景 */
+        text-align: center;
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+
+    .total-summary p {
+        margin: 5px 0;
+        color: #333;
+    }
+
+    .total-summary span {
+        color: #007bff; /* 藍色顯示數值 */
+    }
+
+    /* 響應式調整 */
+    @media (max-width: 768px) {
+        .food-category table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .food-category thead, .food-category tbody, .food-category th, .food-category td, .food-category tr {
+            display: block;
+        }
+        .food-category thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+        .food-category tr { border: 1px solid #ccc; }
+        .food-category td {
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            text-align: right;
+        }
+        .food-category td:before {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+        /*
+        Label the data
+        */
+        .food-category td:nth-of-type(1):before { content: "食物名稱"; }
+        .food-category td:nth-of-type(2):before { content: "每份重量 (g)"; }
+        .food-category td:nth-of-type(3):before { content: "每份蛋白質 (g)"; }
+        .food-category td:nth-of-type(4):before { content: "每份碳水 (g)"; }
+        .food-category td:nth-of-type(5):before { content: "每份脂肪 (g)"; }
+        .food-category td:nth-of-type(6):before { content: "食用份數"; }
+        .food-category td:nth-of-type(7):before { content: "總蛋白質 (g)"; }
+        .food-category td:nth-of-type(8):before { content: "總碳水 (g)"; }
+        .food-category td:nth-of-type(9):before { content: "總脂肪 (g)"; }
+        .food-category td:nth-of-type(10):before { content: "總熱量 (kcal)"; }
+    }
+
+    </style>
 </head>
 <body>
 
   <div class="container" >
-    
+
     <div style="display: flex; justify-content: center; align-items: center; text-align: center;">
       <h1 style="display: flex; align-items: center; margin: 0;">
         <img src="亞樂-去背.png" style="height: 100px; margin-right: 10px;">
@@ -18,7 +147,7 @@
     </div>
 
     <div class="calculator-grid">
-      
+
       <form id="calculator-form">
         <label for="weight">體重 (kg):</label>
         <input type="number" id="weight" required>
@@ -41,7 +170,7 @@
         <select id="activity-level">
           <option value="1.2">久坐 (很少運動)</option>
           <option value="1.375">輕度活動 (輕度運動1-3天/週)</option>
-          <option value="1.55">中度活動 (中度運動3-5天/週)</option>
+          <option value="1.465">中度活動 (中度運動3-5天/週)</option>
           <option value="1.725">高度活動 (高強度運動6-7天/週)</option>
           <option value="1.9">極度活動 (運動員，每日訓練)</option>
         </select>
@@ -55,9 +184,9 @@
 
         <label for="carb-type">飲食模式:</label>
         <select id="carb-type">
-          <option value="low">低碳 (4:2:4)</option>
-          <option value="medium" selected>中碳 (3:3.5:3.5)</option>
-          <option value="high">高碳 (2:5:3)</option>
+          <option value="low">低碳 (P 4:C 2:F 4)</option>
+          <option value="medium" selected>中碳 (P 3:C 4:F 3)</option>
+          <option value="high">高碳 (P 2:C 6:F 2)</option>
         </select>
 
         <button type="submit" style="display: none;">計算熱量需求</button>
@@ -71,23 +200,83 @@
 
     </div>
 
-    <div class="food-options">
-      <h3>食材選項</h3>
-      <div class="food-columns">
-        <div>
-          <h4>蛋白質 <span id="protein-target-servings" class="target-servings-display"></span></h4>
-          <div id="protein-food" class="food-group"></div>
+    <div class="food-exchange-table">
+        <h2>食物代換表</h2>
+        <p class="instruction">請依序填寫蛋白質、碳水化合物、脂肪類食物的份數。每份的營養成分會自動計算。</p>
+
+        <div class="food-category" id="protein-foods">
+            <h3>1. 蛋白質類 <span id="protein-target-servings"></span></h3> <table>
+                <thead>
+                    <tr>
+                        <th>食物名稱</th>
+                        <th>每份重量 (g)</th>
+                        <th>每份蛋白質 (g)</th>
+                        <th>每份碳水 (g)</th>
+                        <th>每份脂肪 (g)</th>
+                        <th>食用份數</th>
+                        <th>總蛋白質 (g)</th>
+                        <th>總碳水 (g)</th>
+                        <th>總脂肪 (g)</th>
+                        <th>總熱量 (kcal)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
         </div>
-        <div>
-          <h4>碳水化合物 <span id="carbs-target-servings" class="target-servings-display"></span></h4>
-          <div id="carb-food" class="food-group"></div>
-          <h4>脂肪 <span id="fat-target-servings" class="target-servings-display"></span></h4>
-          <div id="fat-food" class="food-group"></div>
+
+        <div class="food-category" id="carb-foods">
+            <h3>2. 碳水化合物類 <span id="carbs-target-servings"></span></h3> <table>
+                <thead>
+                    <tr>
+                        <th>食物名稱</th>
+                        <th>每份重量 (g)</th>
+                        <th>每份蛋白質 (g)</th>
+                        <th>每份碳水 (g)</th>
+                        <th>每份脂肪 (g)</th>
+                        <th>食用份數</th>
+                        <th>總蛋白質 (g)</th>
+                        <th>總碳水 (g)</th>
+                        <th>總脂肪 (g)</th>
+                        <th>總熱量 (kcal)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
         </div>
+
+        <div class="food-category" id="fat-foods">
+            <h3>3. 脂肪類 <span id="fat-target-servings"></span></h3> <table>
+                <thead>
+                    <tr>
+                        <th>食物名稱</th>
+                        <th>每份重量 (g)</th>
+                        <th>每份蛋白質 (g)</th>
+                        <th>每份碳水 (g)</th>
+                        <th>每份脂肪 (g)</th>
+                        <th>食用份數</th>
+                        <th>總蛋白質 (g)</th>
+                        <th>總碳水 (g)</th>
+                        <th>總脂肪 (g)</th>
+                        <th>總熱量 (kcal)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+
+      <div class="total-summary">
+          <h3>總計</h3>
+          <p>總蛋白質攝取：<span id="total-protein">0</span> g</p>
+          <p>總碳水化合物攝取：<span id="total-carb">0</span> g</p>
+          <p>總脂肪攝取：<span id="total-fat">0</span> g</p>
+          <p>總熱量攝取：<span id="total-calories">0</span> kcal</p>
+          <p><a href="https://www.hpa.gov.tw/Pages/Detail.aspx?nodeid=485&pid=8380" target="_blank">參考衛福部食物代換表</a></p>
       </div>
     </div>
-
-  </div>
+    </div>
 
   <script src="script.js"></script>
 </body>
