@@ -3,7 +3,7 @@ const foodDatabase = [
     // 蛋白質類
     { name: "雞胸肉", category: "protein", weightPerServing: 30, protein: 7, carb: 0, fat: 3, calories: 55 },
     { name: "鮭魚", category: "protein", weightPerServing: 35, protein: 7, carb: 0, fat: 5, calories: 75 },
-    { name: "雞蛋 (大)", category: "protein", weightPerServing: 55, protein: 7, carb: 0.5, fat: 5, calories: 75 },
+    { name: "雞蛋 (大)", category: "protein", weightPerServing: 55, protein: 7, carb: 0, fat: 5, calories: 75 },
     { name: "豆腐 (板豆腐)", category: "protein", weightPerServing: 80, protein: 7, carb: 0, fat: 5, calories: 75 },
     { name: "希臘優格 (無糖)", category: "protein", weightPerServing: 210, protein: 8, carb: 12, fat: 8, calories: 150 },
     { name: "全脂奶", category: "protein", weightPerServing: 240, protein: 8, carb: 12, fat: 8, calories: 150 }, 
